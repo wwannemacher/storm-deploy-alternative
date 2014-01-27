@@ -31,7 +31,7 @@ public class Attach {
 					n.getGroup() != null &&
 					n.getGroup().toLowerCase().equals(clustername.toLowerCase()) &&
 					n.getUserMetadata().containsKey("daemons")) {
-				String daemons = n.getUserMetadata().get("daemons");
+				String daemons = n.getUserMetadata().get("daemons").replace("[", "").replace("]", "");
 				
 				for (String daemon : daemons.split(",")) {
 					if (daemon.trim().toLowerCase().equals("master"))

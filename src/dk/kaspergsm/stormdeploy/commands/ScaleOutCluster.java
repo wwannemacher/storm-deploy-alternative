@@ -131,7 +131,7 @@ public class ScaleOutCluster {
 						.wrapInInitScript(true)
 						.inboundPorts(22, 6627, 8080) // 22 = SSH, 6627 = Thrift, 8080 = UI
 						.overrideLoginUser("ubuntu")
-						.userMetadata("daemons", "worker")
+						.userMetadata("daemons", "[WORKER]")
 						.runScript(new StatementList(initScript))
 						.overrideLoginCredentials(Tools.getPrivateKeyCredentials())
 						.authorizePublicKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"), Charsets.UTF_8)));
