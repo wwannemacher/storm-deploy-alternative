@@ -44,20 +44,13 @@ public class Zookeeper {
 		return st;
 	}
 	
-	public static List<Statement> startDaemon() {
-		ArrayList<Statement> st = new ArrayList<Statement>();
-		st.add(exec("cd ~/zookeeper/bin/"));
-		st.add(exec("./zkServer.sh start &"));
-		return st;
-	}
-	
 	/**
 	 * Uses Monitor to restart daemon, if it stops
 	 */
 	public static List<Statement> startDaemonSupervision() {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~"));
-		st.add(exec("case $(head -n 1 ~/daemons) in *ZK*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor org.apache.zookeeper.server zookeeper/bin/zkServer.sh start ;; esac &"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *ZK*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor org.apache.zookeeper.server zookeeper/bin/zkServer.sh start ;; esac &' - ubuntu"));
 		return st;
 	}
 }

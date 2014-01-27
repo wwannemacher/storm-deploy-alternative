@@ -119,6 +119,7 @@ public class Tools {
 					.nameTask("Setup")
 				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials())
 				 	.wrapInInitScript(true)
+				 	.overrideLoginUser("ubuntu")
 				 	.blockOnComplete(true)
 				 	.runAsRoot(runAsRoot));
 	}

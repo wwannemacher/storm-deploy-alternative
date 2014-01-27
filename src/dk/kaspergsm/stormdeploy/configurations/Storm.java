@@ -35,27 +35,13 @@ public class Storm {
 		return st;
 	}
 	
-	public static List<Statement> startNimbusDaemon() {
-		ArrayList<Statement> st = new ArrayList<Statement>();
-		st.add(exec("cd ~/storm/bin/"));
-		st.add(exec("./storm nimbus &"));
-		return st;
-	}
-	
 	/**
 	 * Uses Monitor to restart daemon, if it stops
 	 */
 	public static List<Statement> startNimbusDaemonSupervision() {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~"));
-		st.add(exec("case $(head -n 1 ~/daemons) in *MASTER*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.daemon.nimbus storm/bin/storm nimbus ;; esac &"));
-		return st;
-	}
-	
-	public static List<Statement> startSupervisorDaemon() {
-		ArrayList<Statement> st = new ArrayList<Statement>();
-		st.add(exec("cd ~/storm/bin/"));
-		st.add(exec("./storm supervisor &"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *MASTER*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.daemon.nimbus storm/bin/storm nimbus ;; esac &' - ubuntu"));
 		return st;
 	}
 	
@@ -65,14 +51,7 @@ public class Storm {
 	public static List<Statement> startSupervisorDaemonSupervision() {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~"));
-		st.add(exec("case $(head -n 1 ~/daemons) in *WORKER*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.daemon.supervisor storm/bin/storm supervisor ;; esac &"));
-		return st;
-	}
-	
-	public static List<Statement> startUIDaemon() {
-		ArrayList<Statement> st = new ArrayList<Statement>();
-		st.add(exec("cd ~/storm/bin/"));
-		st.add(exec("./storm ui &"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *WORKER*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.daemon.supervisor storm/bin/storm supervisor ;; esac &' - ubuntu"));
 		return st;
 	}
 	
@@ -82,7 +61,7 @@ public class Storm {
 	public static List<Statement> startUIDaemonSupervision() {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~"));
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.ui.core storm/bin/storm ui ;; esac &"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *UI*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.ui.core storm/bin/storm ui ;; esac &' - ubuntu"));
 		return st;
 	}
 	
