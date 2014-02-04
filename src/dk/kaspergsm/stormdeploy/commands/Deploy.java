@@ -77,6 +77,7 @@ public class Deploy {
 			log.info("Configuring instance(s)");
 			Tools.executeOnNodes(
 					NodeConfiguration.getCommands(
+							clustername,
 							credentials,
 							config, 
 							getNewInstancesHostname(config, "ZK", newNodes), 

@@ -14,7 +14,7 @@ import dk.kaspergsm.stormdeploy.userprovided.Credential;
  */
 public class NodeConfiguration {
 	
-	public static List<Statement> getCommands(Credential credentials, Configuration config, List<String> zookeeperHostnames, String nimbusHostname, String uiHostname) {
+	public static List<Statement> getCommands(String clustername, Credential credentials, Configuration config, List<String> zookeeperHostnames, String nimbusHostname, String uiHostname) {
 		List<Statement> commands = new ArrayList<Statement>();
 		
 		// Install system tools and update all packages to increase security
@@ -23,6 +23,11 @@ public class NodeConfiguration {
 		// Install and configure s3cmd (to allow communication with Amazon S3)
 		commands.addAll(S3CMD.install(PACKAGE_MANAGER.APT));
 		commands.addAll(S3CMD.configure(credentials.getIdentity(), credentials.getCredential()));
+		
+		// Install and configure ec2-ami-tools (only if optional x509 credentials have been defined)
+		commands.addAll(EC2Tools.install(PACKAGE_MANAGER.APT));
+		if (credentials.getX509CertificatePath() != null && credentials.getX509CertificatePath().length() > 0 && credentials.getX509PrivateKeyPath() != null && credentials.getX509PrivateKeyPath().length() > 0)
+			commands.addAll(EC2Tools.configure(credentials.getX509CertificatePath(), credentials.getX509PrivateKeyPath(), config.getDeploymentRegion(), clustername));			
 		
 		// Conditional - Download and configure ZeroMQ (including jzmq binding)
 		commands.addAll(ZeroMQ.download());

@@ -71,6 +71,7 @@ public class ScaleOutCluster {
 		Set<NodeMetadata> newWorkerNodes = startWorkerNodesNow(
 				clustername, 
 				NodeConfiguration.getCommands(
+						clustername,
 						credentials, 
 						config, 
 						getInstancesHostname(existingZookeeper), 

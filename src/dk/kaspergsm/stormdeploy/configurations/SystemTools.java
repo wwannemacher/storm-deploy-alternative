@@ -22,6 +22,10 @@ public class SystemTools {
 	public static List<Statement> init(PACKAGE_MANAGER pm) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		if (pm == PACKAGE_MANAGER.APT) {
+			
+			// Enable multiverse
+			st.add(exec("sed -i \"/^# deb.*multiverse/ s/^# //\" /etc/apt/sources.list"));
+			
 			// Init apt
 			st.add(exec("apt-get update -y"));
 			st.add(exec("apt-get upgrade -y"));
