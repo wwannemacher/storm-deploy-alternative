@@ -39,18 +39,21 @@ public class EC2Tools {
 		st.addAll(Tools.echoFile(certPath, "~/.ec2/cert.pem"));
 		st.addAll(Tools.echoFile(privPath, "~/.ec2/priv.pem"));
 		
-		// Setup 
+		// Write configuration to bashrc (for logging in)
 		st.add(exec("echo \"export EC2_KEYPAIR=jclouds#" + jobname + "\" >> ~/.bashrc")); // Export name of keypair to use
 		st.add(exec("echo \"export EC2_URL=https://ec2." + region + ".amazonaws.com\" >> ~/.bashrc")); // Export region url
 		st.add(exec("echo \"export EC2_PRIVATE_KEY=~/.ec2/priv.pem\" >> ~/.bashrc")); // Export location of x509 credentials
 		st.add(exec("echo \"export EC2_CERT=~/.ec2/cert.pem\" >> ~/.bashrc")); // Export location of x509 credentials
 		
+		// Write configuration to profile (for wider shell support)
+		st.add(exec("echo \"export EC2_KEYPAIR=jclouds#" + jobname + "\" >> ~/.profile")); // Export name of keypair to use
+		st.add(exec("echo \"export EC2_URL=https://ec2." + region + ".amazonaws.com\" >> ~/.profile")); // Export region url
+		st.add(exec("echo \"export EC2_PRIVATE_KEY=~/.ec2/priv.pem\" >> ~/.profile")); // Export location of x509 credentials
+		st.add(exec("echo \"export EC2_CERT=~/.ec2/cert.pem\" >> ~/.profile")); // Export location of x509 credentials
+		
 		// Read changes into current environment
 		st.add(exec("source ~/.bashrc"));
 		
-		
-		//		export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
-
 		return st;
 	}
 }
