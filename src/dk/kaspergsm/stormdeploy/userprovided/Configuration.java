@@ -100,6 +100,8 @@ public class Configuration {
 		String version = getRawConfigValue("zk-version");
 		if (version.equals("3.3.3")) {
 			return "s3://zk-releases/zookeeper-3.3.3.tar.gz"; 
+		} else if (version.equals("3.4.5")) {
+			return "s3://zk-releases/zookeeper-3.4.5.tar.gz";
 		} else {
 			log.info("Zookeeper version not currently supported!");
 		}

@@ -6,9 +6,11 @@ _Please don't hesitate to contact me. Your feedback will help to further improve
 + Runs Storm and Zookeeper daemons under supervision (automatically restarted in case of failure)
 + Only fetch and compile what is needed (can deploy on prepared images in a few minutes)
 + Supports executing user-defined commands both pre-config and post-config
-+ Automatically sets up s3cmd, to make it easy to get/put files on [Amazon S3](http://aws.amazon.com/s3/)
++ Automatically sets up s3cmd, making it easy to get/put files on [Amazon S3](http://aws.amazon.com/s3/)
++ Automatically sets up [Ganglia](http://ganglia.sourceforge.net/), making it easy to monitor performance
++ Automatically sets up [Amazon EC2 AMI Tools](http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ami-tools.html) on new nodes
++ Supports Zookeeper versions: _3.3.3_ & _3.4.5_
 + Supports Storm versions: _0.8.2_ & _0.9.0.1_
-+ Supports Zookeeper versions: _3.3.3_
 
 ## Configuration
 This tool, requires two configurationfiles: `conf/credential.yaml` and `conf/configuration.yaml`. Put your Amazon Web Services (AWS) credentials into the file `conf/credential.yaml`. 
@@ -18,6 +20,7 @@ Below is an example of a single cluster configuration, for `conf/configuration.y
 ```
 mycluster:
     - m1.medium {ZK, WORKER, MASTER, UI}
+    - m1.medium {WORKER}
     - storm-version "0.8.2"
     - zk-version "3.3.3"
     - image "eu-west-1/ami-480bea3f" 	#official Ubuntu 13.10 AMI
@@ -27,7 +30,7 @@ mycluster:
 ```
 + WORKER is the Storm Supervisor daemon
 + MASTER is the Storm Nimbus daemon
-+ UI is the Storm User-Interface
++ UI is the Storm and Ganglia User-Interface
 + ZK is the [Zookeeper](http://zookeeper.apache.org) daemon
 
 _Please ensure the image resides in the same region as specified._
