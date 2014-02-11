@@ -26,6 +26,9 @@ public class SystemTools {
 			// Enable multiverse
 			st.add(exec("sed -i \"/^# deb.*multiverse/ s/^# //\" /etc/apt/sources.list"));
 			
+			// Hide interactive installation prompts
+			st.add(exec("export DEBIAN_FRONTEND=noninteractive"));
+			
 			// Init apt
 			st.add(exec("apt-get update -y"));
 			st.add(exec("apt-get upgrade -y"));

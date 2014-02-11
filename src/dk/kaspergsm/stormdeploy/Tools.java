@@ -134,10 +134,10 @@ public class Tools {
 	
 	/**
 	 * Get ports to open
-	 * 	22 = SSH, 6627 = Thrift, 8080 = UI
+	 * 	22 = SSH, 6627 = Thrift, 8080 = UI, 80 = GANGLIA UI
 	 */
 	public static int[] getPortsToOpen() {
-		return new int[]{22, 6627, 8080};
+		return new int[]{22, 6627, 8080, 80};
 	}
 	
 	@SuppressWarnings("unchecked")

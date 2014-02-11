@@ -45,6 +45,9 @@ public class NodeConfiguration {
 		// Download Zookeeper
 		commands.addAll(Zookeeper.download(config.getZKLocation()));
 		
+		// Download Ganglia
+		commands.addAll(Ganglia.install());
+		
 		// Execute custom code, if user provided (pre config)
 		if (config.getRemoteExecPreConfig().size() > 0)
 			commands.addAll(Tools.runCustomCommands(config.getRemoteExecPreConfig()));
@@ -55,6 +58,9 @@ public class NodeConfiguration {
 		// Configure Storm (update configurationfiles)
 		commands.addAll(Storm.configure(nimbusHostname, zookeeperHostnames));
 		
+		// Configure Ganglia
+		commands.addAll(Ganglia.configure(clustername, uiHostname));
+				
 		// Execute custom code, if user provided (post config)
 		if (config.getRemoteExecPostConfig().size() > 0)
 			commands.addAll(Tools.runCustomCommands(config.getRemoteExecPostConfig()));
@@ -67,6 +73,7 @@ public class NodeConfiguration {
 		commands.addAll(Storm.startNimbusDaemonSupervision());
 		commands.addAll(Storm.startSupervisorDaemonSupervision());
 		commands.addAll(Storm.startUIDaemonSupervision());
+		commands.addAll(Ganglia.start());
 		
 		/**
 		 * Start memory manager (to sharing of resources among Java processes)

@@ -104,7 +104,8 @@ public class Deploy {
 		log.info("Started:");
 		for (NodeMetadata n : newNodes.values())
 			log.info("\t" + n.getPublicAddresses().iterator().next() + "\t" + n.getUserMetadata().get("daemons").toString());
-		
+		log.info("Storm UI: http://" + getUINode(config, newNodes).getPublicAddresses().iterator().next() + ":8080");
+		log.info("Ganglia UI: http://" + getUINode(config, newNodes).getPublicAddresses().iterator().next() + "/ganglia");
 		
 		/**
 		 * Close application now
