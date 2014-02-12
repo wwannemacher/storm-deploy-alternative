@@ -31,7 +31,6 @@ public class SystemTools {
 			
 			// Init apt
 			st.add(exec("apt-get update -y"));
-			st.add(exec("apt-get upgrade -y"));
 			
 			// Install JDK (OpenJDK 7)
 			st.add(exec("apt-get install -y openjdk-7-jdk"));
@@ -54,10 +53,6 @@ public class SystemTools {
 			st.add(exec("apt-get install -y automake1.10"));
 			st.add(exec("apt-get install -y unzip"));
 			st.add(exec("update-alternatives --set automake /usr/bin/automake-1.10"));
-
-			// Finalize install
-			st.add(exec("apt-get upgrade -y"));
-			st.add(exec("apt-get autoremove -y"));
 			
 		} else {
 			log.error("PACKAGE MANAGER not supported: " + pm.toString());

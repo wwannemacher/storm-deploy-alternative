@@ -1,4 +1,4 @@
-Fast tool to deploy [Storm](https://github.com/nathanmarz/storm) on [Amazon EC2](http://aws.amazon.com/ec2/), written entirely in Java.
+Fast tool to deploy [Storm](https://github.com/nathanmarz/storm) on [Amazon EC2](http://aws.amazon.com/ec2/), written entirely in Java. Download latest release [here](https://s3-eu-west-1.amazonaws.com/storm-deploy-alternative/SDA-12Feb2014.tar.gz)
 
 _Please don't hesitate to contact me. Your feedback will help to further improve this tool._
 

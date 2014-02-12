@@ -16,14 +16,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.jclouds</groupId>
+			<groupId>org.apache.jclouds</groupId>
 			<artifactId>jclouds-all</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jclouds.driver</groupId>
+			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-log4j</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -31,24 +31,24 @@
 			<version>1.7.5</version>
 		</dependency>  
 		<dependency>
-			<groupId>org.jclouds.driver</groupId>
+			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-slf4j</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jclouds.driver</groupId>
+			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-sshj</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jclouds.driver</groupId>
+			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-bouncycastle</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jclouds.driver</groupId>
+			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-enterprise</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
  		<dependency>
                         <groupId>com.sun</groupId>
