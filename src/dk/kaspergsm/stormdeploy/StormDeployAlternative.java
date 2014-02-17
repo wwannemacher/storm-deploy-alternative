@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dk.kaspergsm.stormdeploy.commands.Attach;
 import dk.kaspergsm.stormdeploy.commands.Deploy;
+import dk.kaspergsm.stormdeploy.commands.GetLogs;
 import dk.kaspergsm.stormdeploy.commands.ScaleOutCluster;
 import dk.kaspergsm.stormdeploy.userprovided.Configuration;
 import dk.kaspergsm.stormdeploy.userprovided.Credential;
@@ -24,6 +25,7 @@ public class StormDeployAlternative {
 			log.error("Wrong arguments provided, the following is supported:");
 			log.error(" deploy CLUSTERNAME");
 			log.error(" attach CLUSTERNAME");
+			log.error(" getlog CLUSTERNAME");
 			log.error(" scaleout CLUSTERNAME #InstancesToAdd InstanceType");
 			System.exit(0);
 		}
@@ -92,6 +94,10 @@ public class StormDeployAlternative {
 		} else if (operation.trim().toLowerCase().equals("attach")) {
 			
 			Attach.attach(clustername, computeContext);
+		
+		} else if (operation.trim().toLowerCase().equals("getlog")) {
+			
+			GetLogs.run(clustername, computeContext);
 			
 		} else {
 			log.error("Unsupported operation " + operation);
