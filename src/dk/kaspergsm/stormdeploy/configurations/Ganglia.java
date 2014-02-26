@@ -56,6 +56,13 @@ public class Ganglia {
 		
 		// In case node is containing UI, it should add cluster as datasource
 		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) echo data_source \"" + clustername + "\" localhost >> /etc/ganglia/gmetad.conf ;; esac"));
+		
+		// In case node is containing UI, it should modify auto_system to disabled. This allows events to be added externally to Ganglia
+		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) sed \"s/$conf\\['auth_system'\\] = 'readonly'/$conf\\['auth_system'\\] = 'disabled'/\" -i \"/usr/share/ganglia-webfrontend/conf_default.php\" ;; esac"));
+		
+		// In case node is containing UI, it should make events.json writable by apache webserver
+		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) chmod 777 /var/lib/ganglia-web/conf/events.json ;; esac"));
+		
 		return st;
 	}
 	
@@ -64,6 +71,9 @@ public class Ganglia {
 	 */
 	public static List<Statement> start() {
 		ArrayList<Statement> st = new ArrayList<Statement>();
+		
+		// In case node is containing UI, it should enable module_rewrite for apache2
+		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) a2enmod rewrite ;; esac"));
 		
 		// In case node is containing UI, it should restart apache2 webserver
 		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) /etc/init.d/apache2 restart ;; esac"));
