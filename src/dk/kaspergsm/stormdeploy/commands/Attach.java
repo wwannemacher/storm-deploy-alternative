@@ -26,6 +26,7 @@ public class Attach {
 		ArrayList<NodeMetadata> zkNodes = new ArrayList<NodeMetadata>();
 		ArrayList<NodeMetadata> workerNodes = new ArrayList<NodeMetadata>();
 		NodeMetadata nimbus = null;
+		NodeMetadata ui = null;
 		for (NodeMetadata n : (Set<NodeMetadata>) computeContext.getComputeService().listNodes()) {			
 			if (n.getStatus() != Status.TERMINATED &&
 					n.getGroup() != null &&
@@ -40,16 +41,25 @@ public class Attach {
 						workerNodes.add(n);
 					if (daemon.trim().toLowerCase().equals("zk"))
 						zkNodes.add(n);
+					if (daemon.trim().toLowerCase().equals("ui"))
+						ui = n;
 				}
 			}
 		}
-		
 		
 		/**
 		 * Update attachment
 		 */
 		try {
-			Storm.writeStormAttachConfigFiles(getInstancesPublicIp(zkNodes), getInstancesPublicIp(workerNodes), nimbus.getPublicAddresses().iterator().next());
+			String uiPublicAddress = "";
+			if (ui != null)
+				uiPublicAddress = ui.getPublicAddresses().iterator().next();
+			
+			Storm.writeStormAttachConfigFiles(
+					getInstancesPublicIp(zkNodes), 
+					getInstancesPublicIp(workerNodes), 
+					nimbus.getPublicAddresses().iterator().next(),
+					uiPublicAddress);
 			log.info("Attached to cluster");
 		} catch (IOException ex) {
 			log.error("Problem attaching to cluster", ex);

@@ -64,7 +64,16 @@ public class Deploy {
 		 */
 		try {
 			log.info("Attaching to cluster");
-			Storm.writeStormAttachConfigFiles(getNewInstancesPublicIp(config, "ZK", newNodes), getNewInstancesPublicIp(config, "WORKER", newNodes), getNimbusNode(config, newNodes).getPublicAddresses().iterator().next());
+			
+			String uiPublicAddress = "";
+			if (getUINode(config, newNodes) != null)
+				uiPublicAddress = getUINode(config, newNodes).getPublicAddresses().iterator().next();
+			
+			Storm.writeStormAttachConfigFiles(
+					getNewInstancesPublicIp(config, "ZK", newNodes), 
+					getNewInstancesPublicIp(config, "WORKER", newNodes), 
+					getNimbusNode(config, newNodes).getPublicAddresses().iterator().next(),
+					uiPublicAddress);
 		} catch (IOException ex) {
 			log.error("Problem attaching to cluster", ex);
 		}

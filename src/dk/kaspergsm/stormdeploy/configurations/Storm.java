@@ -69,7 +69,7 @@ public class Storm {
 	 * Used to write config files to $HOME/.storm/
 	 * these are needed for the storm script to know where to submit topologies etc.
 	 */
-	public static void writeStormAttachConfigFiles(List<String> zookeeperNodesHostname, List<String> supervisorNodesHostname, String nimbusHost) throws IOException {
+	public static void writeStormAttachConfigFiles(List<String> zookeeperNodesHostname, List<String> supervisorNodesHostname, String nimbusHost, String uiHost) throws IOException {
 		String userHome = Tools.getHomeDir();
 		new File(userHome + ".storm").mkdirs();
 		
@@ -83,7 +83,10 @@ public class Storm {
 		}
 		stormYaml.append("nimbus.host: \"");
 		stormYaml.append(nimbusHost);
-		stormYaml.append("\"\n");		
+		stormYaml.append("\"\n");
+		stormYaml.append("ui.host: \"");
+		stormYaml.append(uiHost);
+		stormYaml.append("\"\n");
 		stormYaml.flush();
 		stormYaml.close();
 		
