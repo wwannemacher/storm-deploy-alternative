@@ -31,8 +31,7 @@ public class NodeConfiguration {
 		
 		// Conditional - Download and configure ZeroMQ (including jzmq binding)
 		commands.addAll(ZeroMQ.download());
-		commands.addAll(ZeroMQ.compile());
-		commands.addAll(ZeroMQ.installJavaBinding());
+		commands.addAll(ZeroMQ.configure());
 		
 		// Download and configure snorm-deploy-alternative (before anything with supervision is started)
 		commands.addAll(StormDeployAlternative.download());
