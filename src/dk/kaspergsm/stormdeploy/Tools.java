@@ -220,4 +220,8 @@ public class Tools {
 			exec = exec.substring(0, exec.lastIndexOf(";"));
 		return "if [ " + cond + " ]; then " + exec + "; fi";
 	}
+	
+	public static Statement execOnUI(String cmd) {
+		return exec("case $(head -n 1 ~/daemons) in *UI*) " + cmd + " ;; esac");
+	}
 }

@@ -74,9 +74,9 @@ public class ScaleOutCluster {
 						clustername,
 						credentials, 
 						config, 
-						getInstancesHostname(existingZookeeper), 
-						nimbus.getHostname(), 
-						ui.getHostname()), 
+						getInstancesPrivateIp(existingZookeeper), 
+						nimbus.getPrivateAddresses().iterator().next(), 
+						ui.getPrivateAddresses().iterator().next()), 
 					instanceType, 
 					numInstances, 
 					image, 
@@ -105,10 +105,10 @@ public class ScaleOutCluster {
 		System.exit(0);
 	}
 	
-	private static List<String> getInstancesHostname(ArrayList<NodeMetadata> nodes) {
+	private static List<String> getInstancesPrivateIp(ArrayList<NodeMetadata> nodes) {
 		ArrayList<String> newNodes = new ArrayList<String>();
 		for (NodeMetadata n : nodes)
-			newNodes.add(n.getHostname());
+			newNodes.add(n.getPrivateAddresses().iterator().next());
 		return newNodes;
 	}
 	

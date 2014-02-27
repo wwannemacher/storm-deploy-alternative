@@ -1,11 +1,10 @@
 package dk.kaspergsm.stormdeploy.configurations;
 
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jclouds.scriptbuilder.domain.Statement;
+import dk.kaspergsm.stormdeploy.Tools;
 
 /**
  * Contains all methods to install Ganglia
@@ -24,7 +23,7 @@ public class Ganglia {
 		st.add(exec("apt-get install -y ganglia-monitor gmetad rrdtool librrds-perl librrd-dev"));
 		
 		// Install webinterface only on one node
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) apt-get install -q -y ganglia-webfrontend ;; esac"));
+		st.add(Tools.execOnUI("apt-get install -q -y ganglia-webfrontend"));
 		
 		// Ensure daemons have not been started
 		st.add(exec("/etc/init.d/ganglia-monitor stop"));
@@ -49,19 +48,19 @@ public class Ganglia {
 		st.add(exec("cat /etc/ganglia/stripped_gmond.conf >> /etc/ganglia/gmond.conf"));
 		
 		// In case node is containing UI, it should be deaf = no!
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) sed \"s/deaf = yes/deaf = no/\" -i \"/etc/ganglia/gmond.conf\" ;; esac"));
+		st.add(Tools.execOnUI("sed \"s/deaf = yes/deaf = no/\" -i \"/etc/ganglia/gmond.conf\""));
 		
 		// In case node is containing UI, it should create /ganglia alias for apache2 server
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/ ;; esac"));
+		st.add(Tools.execOnUI("cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/"));
 		
 		// In case node is containing UI, it should add cluster as datasource
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) echo data_source \"" + clustername + "\" localhost >> /etc/ganglia/gmetad.conf ;; esac"));
+		st.add(Tools.execOnUI("echo data_source \"" + clustername + "\" localhost >> /etc/ganglia/gmetad.conf"));
 		
 		// In case node is containing UI, it should modify auto_system to disabled. This allows events to be added externally to Ganglia
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) sed \"s/$conf\\['auth_system'\\] = 'readonly'/$conf\\['auth_system'\\] = 'disabled'/\" -i \"/usr/share/ganglia-webfrontend/conf_default.php\" ;; esac"));
+		st.add(Tools.execOnUI("sed \"s/$conf\\['auth_system'\\] = 'readonly'/$conf\\['auth_system'\\] = 'disabled'/\" -i \"/usr/share/ganglia-webfrontend/conf_default.php\""));
 		
 		// In case node is containing UI, it should make events.json writable by apache webserver
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) chmod 777 /var/lib/ganglia-web/conf/events.json ;; esac"));
+		st.add(Tools.execOnUI("chmod 777 /var/lib/ganglia-web/conf/events.json"));
 		
 		return st;
 	}
@@ -73,13 +72,13 @@ public class Ganglia {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		
 		// In case node is containing UI, it should enable module_rewrite for apache2
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) a2enmod rewrite ;; esac"));
+		st.add(Tools.execOnUI("a2enmod rewrite"));
 		
 		// In case node is containing UI, it should restart apache2 webserver
-		st.add(exec("case $(head -n 1 ~/daemons) in *UI*) /etc/init.d/apache2 restart ;; esac"));
+		st.add(Tools.execOnUI("/etc/init.d/apache2 restart"));
 		
-		st.add(exec("/etc/init.d/ganglia-monitor start"));
-		st.add(exec("/etc/init.d/gmetad start"));
+		st.add(exec("/etc/init.d/ganglia-monitor restart"));
+		st.add(exec("/etc/init.d/gmetad restart"));
 		return st;
 	}
 	
@@ -101,14 +100,14 @@ public class Ganglia {
 		"}" + "\n" +
 		"" + "\n" +
 		"cluster {" + "\n" +
-		"  name = \"" + clustername + "\"" + "\n" +
-		"  owner = \"unspecified\"" + "\n" +
-		"  latlong = \"unspecified\"" + "\n" +
-		"  url = \"unspecified\"" + "\n" +
+		"  name = \\\"" + clustername + "\\\"" + "\n" +
+		"  owner = \\\"unspecified\\\"" + "\n" +
+		"  latlong = \\\"unspecified\\\"" + "\n" +
+		"  url = \\\"unspecified\\\"" + "\n" +
 		"}" + "\n" +
 		"" + "\n" +
 		"host {" + "\n" +
-		"  location = \"unspecified\"" + "\n" +
+		"  location = \\\"unspecified\\\"" + "\n" +
 		"}" + "\n" +
 		"" + "\n" +
 		"udp_send_channel {" + "\n" +

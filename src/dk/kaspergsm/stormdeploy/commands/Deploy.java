@@ -89,9 +89,9 @@ public class Deploy {
 							clustername,
 							credentials,
 							config, 
-							getNewInstancesHostname(config, "ZK", newNodes), 
-							getNimbusNode(config, newNodes).getHostname(), 
-							getUINode(config, newNodes).getHostname()),
+							getNewInstancesPrivateIp(config, "ZK", newNodes), 
+							getNimbusNode(config, newNodes).getPrivateAddresses().iterator().next(), 
+							getUINode(config, newNodes).getPrivateAddresses().iterator().next()),
 					true,
 					clustername, 
 					computeContext.getComputeService());
@@ -151,7 +151,7 @@ public class Deploy {
 		return newNodes;
 	}
 	
-	private static ArrayList<String> getNewInstancesHostname(Configuration config, String daemon, HashMap<Integer, NodeMetadata> nodes) {
+	private static ArrayList<String> getNewInstancesPrivateIp(Configuration config, String daemon, HashMap<Integer, NodeMetadata> nodes) {
 		ArrayList<Integer> nodeIds = new ArrayList<Integer>(nodes.keySet());
 		Collections.sort(nodeIds);
 		
@@ -159,7 +159,7 @@ public class Deploy {
 		for (int nodeid : nodeIds) {
 			NodeMetadata n = nodes.get(nodeid);
 			if (n.getUserMetadata().containsKey("daemons") && n.getUserMetadata().get("daemons").contains(daemon))
-				newNodes.add(n.getHostname());
+				newNodes.add(n.getPrivateAddresses().iterator().next());
 		}
 		return newNodes;
 	}
