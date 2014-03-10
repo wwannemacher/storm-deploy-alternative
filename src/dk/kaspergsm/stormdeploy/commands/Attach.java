@@ -59,7 +59,8 @@ public class Attach {
 					getInstancesPublicIp(zkNodes), 
 					getInstancesPublicIp(workerNodes), 
 					nimbus.getPublicAddresses().iterator().next(),
-					uiPublicAddress);
+					uiPublicAddress,
+					clustername);
 			log.info("Attached to cluster");
 		} catch (IOException ex) {
 			log.error("Problem attaching to cluster", ex);

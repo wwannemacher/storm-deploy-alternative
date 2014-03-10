@@ -73,7 +73,8 @@ public class Deploy {
 					getNewInstancesPublicIp(config, "ZK", newNodes), 
 					getNewInstancesPublicIp(config, "WORKER", newNodes), 
 					getNimbusNode(config, newNodes).getPublicAddresses().iterator().next(),
-					uiPublicAddress);
+					uiPublicAddress, 
+					clustername);
 		} catch (IOException ex) {
 			log.error("Problem attaching to cluster", ex);
 		}
