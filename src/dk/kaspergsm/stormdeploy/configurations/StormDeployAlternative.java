@@ -25,8 +25,7 @@ public class StormDeployAlternative {
 	 */
 	public static List<Statement> runMemoryMonitor() {
 		ArrayList<Statement> st = new ArrayList<Statement>();
-		st.add(exec("cd ~/sda/"));
-		st.add(exec("java -cp \"storm-deploy-alternative.jar:$( find `ls -d /usr/lib/jvm/* | sort -k1 -r` -name 'tools.jar' | head -1 )\" dk.kaspergsm.stormdeploy.image.MemoryMonitor &"));
+		st.add(exec("su -c 'java -cp \"/home/ubuntu/sda/storm-deploy-alternative.jar:$( find `ls -d /usr/lib/jvm/* | sort -k1 -r` -name tools.jar | head -1 )\" dk.kaspergsm.stormdeploy.image.MemoryMonitor &' - ubuntu"));
 		return st;
 	}
 	

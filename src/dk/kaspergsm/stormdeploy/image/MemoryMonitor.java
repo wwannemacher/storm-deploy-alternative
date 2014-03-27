@@ -11,6 +11,8 @@ import java.util.Arrays;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sun.tools.attach.VirtualMachine;
 
 /**
@@ -18,29 +20,45 @@ import com.sun.tools.attach.VirtualMachine;
  * if freeMemory < 10% on node, do garbage collection on all JVM.
  * 	This is needed to ensure all java processes give back their unused memory when needed.
  * 
- * Can be executed by:
+ * can be executed by:
  * java -cp "storm-deploy-alternative.jar:/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar" dk.kaspergsm.stormdeploy.image.MemoryMonitor
  * 
  * @author Kasper Grud Skat Madsen
  */
 class MemoryMonitor {
+	private static Logger log = LoggerFactory.getLogger(MemoryMonitor.class);
+	
 	public static void main(String[] args) throws IOException {
-		boolean _runJob = true;
+		log.info("Initialized MemoryMonitor");
+		log.info("Software for helping Java proceses share memory");
+		log.info("it works by invoking garbage collection on all Java processes as needed");
 		
-		while (_runJob) {
-			// Get memory information from node
-			Long freeMem = getFreeMemoryNode();
-			Long totalMem = getTotalMemoryNode();
-			if (freeMem != null && totalMem != null) {
-				// Calculate unused memory in %
-				double freeMemory = ((double)freeMem / (double)totalMem) * 100;
-				if (freeMemory < 10) {
-					for (String jvmPid : getAllJavaProcesses())
-						GCExternalProcess(jvmPid);						
-					sleep(10);
+		while (true) {
+			try {
+				// Get memory information from node
+				Long freeMem = getFreeMemoryNode();
+				Long totalMem = getTotalMemoryNode();
+				if (freeMem != null && totalMem != null) {
+					// Calculate unused memory in %
+					double freeMemory = ((double)freeMem / (double)totalMem) * 100;
+					if (freeMemory < 10) {
+						log.info("Detected system has less than 10% free memory");
+						GCExternalProcesses(); // invoke gc on all java processes
+						sleep(10);
+					} else if (freeMemory < 20) {
+						log.info("Detected system has less than 20% free memory");
+						GCExternalProcesses(); // invoke gc on all java processes
+						sleep(30);
+					} else if (freeMemory < 40) {
+						log.info("Detected system has less than 40% free memory");
+						GCExternalProcesses(); // invoke gc on all java processes
+						sleep(60);
+					}
 				}
+				sleep(5);
+			} catch (Exception ex) {
+				log.error("Problem", ex);
 			}
-			sleep(5);
 		}
 	}
 	
@@ -67,7 +85,8 @@ class MemoryMonitor {
             }
             is.close();
     		process.waitFor();
-        } catch (Exception e) {
+        } catch (Exception ex) {
+        	log.error("Problem", ex);
             return null;
         }
 		return memTotal;
@@ -103,7 +122,8 @@ class MemoryMonitor {
             }
             is.close();
     		process.waitFor();
-        } catch (Exception e) {
+        } catch (Exception ex) {
+        	log.error("Problem", ex);
             return null;
         }
 		
@@ -123,8 +143,17 @@ class MemoryMonitor {
             	javaProcesses.add(line.substring(0, line.indexOf(" ")).trim());
             is.close();
     		process.waitFor();
-        } catch (Exception e) {}
+        } catch (Exception ex) {
+        	log.error("Problem", ex);
+        }
 		return javaProcesses;
+	}
+	
+	private static void GCExternalProcesses() {
+		for (String jvmPid : getAllJavaProcesses()) {
+			log.info("Requested process ( pid " + jvmPid + " ) to garbage collect");
+			GCExternalProcess(jvmPid);
+		}
 	}
 	
 	private static void GCExternalProcess(String pid) {
@@ -146,6 +175,7 @@ class MemoryMonitor {
 			// Do GC
 			ManagementFactory.newPlatformMXBeanProxy(connector.getMBeanServerConnection(), ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class).gc();			
 		} catch (Exception ex) {
+			log.error("Problem", ex);
 		}
 
 		// Detach from JVM process
@@ -155,6 +185,7 @@ class MemoryMonitor {
 			if (vm != null)
 				vm.detach();
 		} catch (Exception ex) {
+			log.error("Problem", ex);
 		}
 	}
 }
