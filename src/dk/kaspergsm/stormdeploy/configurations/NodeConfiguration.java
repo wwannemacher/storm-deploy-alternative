@@ -22,12 +22,12 @@ public class NodeConfiguration {
 
 		// Install and configure s3cmd (to allow communication with Amazon S3)
 		commands.addAll(S3CMD.install(PACKAGE_MANAGER.APT));
-		commands.addAll(S3CMD.configure(credentials.getIdentity(), credentials.getCredential()));
+		commands.addAll(S3CMD.configure(credentials.get_ec2_identity(), credentials.get_ec2_credential()));
 		
 		// Install and configure ec2-ami-tools (only if optional x509 credentials have been defined)
 		commands.addAll(EC2Tools.install(PACKAGE_MANAGER.APT));
-		if (credentials.getX509CertificatePath() != null && credentials.getX509CertificatePath().length() > 0 && credentials.getX509PrivateKeyPath() != null && credentials.getX509PrivateKeyPath().length() > 0)
-			commands.addAll(EC2Tools.configure(credentials.getX509CertificatePath(), credentials.getX509PrivateKeyPath(), config.getDeploymentRegion(), clustername));			
+		if (credentials.get_ec2_X509CertificatePath() != null && credentials.get_ec2_X509CertificatePath().length() > 0 && credentials.get_ec2_X509PrivateKeyPath() != null && credentials.get_ec2_X509PrivateKeyPath().length() > 0)
+			commands.addAll(EC2Tools.configure(credentials.get_ec2_X509CertificatePath(), credentials.get_ec2_X509PrivateKeyPath(), config.getDeploymentRegion(), clustername));			
 		
 		// Conditional - Download and configure ZeroMQ (including jzmq binding)
 		commands.addAll(ZeroMQ.download());

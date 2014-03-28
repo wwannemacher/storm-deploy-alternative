@@ -19,7 +19,6 @@ import dk.kaspergsm.stormdeploy.userprovided.Credential;
  */
 public class StormDeployAlternative {
 	private static Logger log = LoggerFactory.getLogger(StormDeployAlternative.class);
-	private static String _provider = "aws-ec2";
 	
 	public static void main(String[] args) {
 		if (args.length <= 1) {
@@ -39,7 +38,7 @@ public class StormDeployAlternative {
 		String operation = args[0];
 		String clustername = args[1];
 		Configuration config = Configuration.fromYamlFile(new File(Tools.getWorkDir() + "conf" + File.separator + "configuration.yaml"), clustername);
-		Credential credentials = Credential.fromYamlFile(new File(Tools.getWorkDir() + "conf" + File.separator + "credential.yaml"));
+		Credential credentials = new Credential(new File(Tools.getWorkDir() + "conf" + File.separator + "credential.yaml"));
 		
 		
 		/**
@@ -53,8 +52,8 @@ public class StormDeployAlternative {
 		/**
 		 * Check selected cloud provider is supported
 		 */
-		if (!Tools.getAllProviders().contains(_provider)) {
-			log.error("provider " + _provider + " not in supported list: " + Tools.getAllProviders());
+		if (!Tools.getAllProviders().contains(config.getProvider())) {
+			log.error("provider " + config.getProvider() + " not in supported list: " + Tools.getAllProviders());
 			System.exit(0);
 		}
 		
@@ -71,7 +70,7 @@ public class StormDeployAlternative {
 		/**
 		 * Initialize connection to cloud provider
 		 */
-		ComputeServiceContext computeContext = Tools.initComputeServiceContext(_provider, credentials);
+		ComputeServiceContext computeContext = Tools.initComputeServiceContext(config.getProvider(), config, credentials);
 		log.info("Initialized cloud provider service");
 		
 		

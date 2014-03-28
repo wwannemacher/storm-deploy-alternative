@@ -20,6 +20,8 @@ public class Configuration {
 	private ArrayList<String> _conf;
 	
 	private HashSet<String> _allConfigurationSettings = new HashSet<String>(Arrays.asList(
+			"provider",
+			"provider-endpoint",
 			"storm-version", 
 			"zk-version",
 			"image",
@@ -43,6 +45,21 @@ public class Configuration {
 	public boolean sanityCheck() {
 		if (_conf == null) {
 			log.error("Clustername not found in configuration.yaml");
+			return false;
+		}
+		
+		if (getProvider() == null) {
+			log.error("Provider must be specified. For instance: provider \"cloudstack\" or provider \"aws-ec2\"");
+			return false;
+		}
+		
+		if (!getProvider().equalsIgnoreCase("cloudstack") && !getProvider().equalsIgnoreCase("aws-ec2")) {
+			log.error("Only Amazon EC2 and CloudStack are supported providers");
+			return false;
+		}
+		
+		if (getProvider().equalsIgnoreCase("cloudstack") && getProviderEndpoint() == null) {
+			log.error("When using cloudstack, a provider-endpoint must be specified. For instance: provider-endpoint \"http://ip:port/client/api\"");
 			return false;
 		}
 		
@@ -77,6 +94,20 @@ public class Configuration {
 			}
 		}
 		return execPostConfig;
+	}
+	
+	/**
+	 * Get provider endpoint
+	 */
+	public String getProviderEndpoint() {
+		return getRawConfigValue("provider-endpoint");
+	}
+	
+	/**
+	 * Get provider
+	 */
+	public String getProvider() {
+		return getRawConfigValue("provider");
 	}
 	
 	/**

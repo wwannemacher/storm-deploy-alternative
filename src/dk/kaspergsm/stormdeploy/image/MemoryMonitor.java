@@ -128,6 +128,8 @@ class MemoryMonitor {
 	}
 	
 	private static void GCExternalProcess(String pid) {
+		System.out.println("Asked process with pid " + pid + " to do GC");
+		
 		VirtualMachine vm = null;
 		JMXConnector connector = null;
 

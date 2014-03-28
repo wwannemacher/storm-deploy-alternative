@@ -41,6 +41,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Module;
+
+import dk.kaspergsm.stormdeploy.userprovided.Configuration;
 import dk.kaspergsm.stormdeploy.userprovided.Credential;
 
 public class Tools {
@@ -86,7 +88,7 @@ public class Tools {
 	/**
 	 * Initialize JClouds
 	 */
-	public static ComputeServiceContext initComputeServiceContext(String provider, Credential c) {
+	public static ComputeServiceContext initComputeServiceContext(String provider, Configuration conf, Credential cred) {
 		Properties properties = new Properties();
 		
 		// Max time a script can take to execute
@@ -99,12 +101,24 @@ public class Tools {
 		properties.setProperty(Constants.PROPERTY_MAX_CONNECTIONS_PER_HOST, "5");
 		properties.setProperty(Constants.PROPERTY_MAX_CONNECTIONS_PER_CONTEXT, "20");
 		properties.setProperty(Constants.PROPERTY_MAX_CONNECTION_REUSE, "10");
-		properties.setProperty(Constants. PROPERTY_MAX_RETRIES, "999999");
+		properties.setProperty(Constants.PROPERTY_MAX_RETRIES, "999999");
 		
-		// example of injecting a ssh implementation
+		// inject ssh implementation
 		Iterable<Module> modules = ImmutableSet.<Module> of(new SshjSshClientModule(), new SLF4JLoggingModule(), new EnterpriseConfigurationModule());
 
-		ContextBuilder builder = ContextBuilder.newBuilder(provider).credentials(c.getIdentity(), c.getCredential()).modules(modules).overrides(properties);
+		ContextBuilder builder = null;
+		
+		// CloudStack
+		if (provider.equalsIgnoreCase("cloudstack")) {
+			properties.setProperty(Constants.PROPERTY_ENDPOINT, conf.getProviderEndpoint());
+			builder = ContextBuilder.newBuilder(provider).credentials(cred.get_cs_identity(), cred.get_cs_credential()).modules(modules).overrides(properties);
+		}
+		
+		// Amazon EC2 
+		else if (provider.equalsIgnoreCase("aws-ec2")) {
+			builder = ContextBuilder.newBuilder(provider).credentials(cred.get_ec2_identity(), cred.get_ec2_credential()).modules(modules).overrides(properties);
+		}
+		
 		return builder.buildView(ComputeServiceContext.class);
 	}
 	

@@ -14,50 +14,44 @@ import dk.kaspergsm.stormdeploy.Tools;
  */
 public class Credential {
 	private static Logger log = LoggerFactory.getLogger(Credential.class);
+	private String _identityCloudStack = null, _credentialCloudStack = null;
+	private String _identityEC2 = null, _credentialEC2 = null;
 	private String _x509pkPath = null, _x509certPath = null;
-	private String _identity, _credential;
-	
-	public static Credential fromYamlFile(File f) {
-		HashMap<String, Object> credentials = Tools.readYamlConf(f);
-		if (!credentials.containsKey("identity") || !credentials.containsKey("credential")) {
-			log.error("credential.yaml must contain both identity and credential");
-			System.exit(0);
-		}
 		
-		Credential c = new Credential((String)credentials.get("identity"), (String)credentials.get("credential"));		
-		if (credentials.containsKey("x509-certificate-path"))
-			c.setX509CerfiticatePath((String)credentials.get("x509-certificate-path"));
-		if (credentials.containsKey("x509-private-path"))
-			c.setX509PrivateKeyPath((String)credentials.get("x509-private-path"));
-		return c;
+	public Credential(File f) {
+		HashMap<String, Object> credentials = Tools.readYamlConf(f);
+		
+		if (credentials.containsKey("ec2-identity"))
+			_identityEC2 = (String)credentials.get("ec2-identity");
+		if (credentials.containsKey("ec2-credential"))
+			_credentialEC2 = (String)credentials.get("ec2-credential");
+		if (credentials.containsKey("cs-identity"))
+			_identityCloudStack = (String)credentials.get("cs-identity");
+		if (credentials.containsKey("cs-credential"))
+			_credentialCloudStack = (String)credentials.get("cs-credential");
 	}
 	
-	public Credential(String identity, String credential) {
-		_identity = identity;
-		_credential = credential;
-	}
-	
-	public void setX509PrivateKeyPath(String path) {
-		_x509pkPath = path;
-	}
-	
-	public String getX509PrivateKeyPath() {
+	public String get_ec2_X509PrivateKeyPath() {
 		return _x509pkPath;
 	}
 	
-	public void setX509CerfiticatePath(String path) {
-		_x509certPath = path;
-	}
-	
-	public String getX509CertificatePath() {
+	public String get_ec2_X509CertificatePath() {
 		return _x509certPath;
 	}
 	
-	public String getIdentity() {
-		return _identity;
+	public String get_ec2_identity() {
+		return _identityEC2;
 	}
 	
-	public String getCredential() {
-		return _credential;
+	public String get_ec2_credential() {
+		return _credentialEC2;
+	}
+	
+	public String get_cs_identity() {
+		return _identityCloudStack;
+	}
+	
+	public String get_cs_credential() {
+		return _credentialCloudStack;
 	}
 }
