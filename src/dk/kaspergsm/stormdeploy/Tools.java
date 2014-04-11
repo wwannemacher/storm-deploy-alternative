@@ -217,7 +217,7 @@ public class Tools {
 			st.add(exec("wget " + remotePath));	
 		}
 		
-		String fileName = remotePath.substring(remotePath.lastIndexOf(File.separator) + 1);
+		String fileName = remotePath.substring(remotePath.lastIndexOf("/") + 1);
 		if (extract)
 			st.add(exec("tar -zxf " + fileName));
 		if (delete)

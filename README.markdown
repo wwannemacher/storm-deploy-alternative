@@ -1,4 +1,4 @@
-Fast tool to deploy [Storm](https://github.com/nathanmarz/storm) on [Amazon EC2](http://aws.amazon.com/ec2/), written entirely in Java. Download latest release [here](https://s3-eu-west-1.amazonaws.com/storm-deploy-alternative/SDA-12Feb2014.tar.gz)
+Fast tool to deploy [Storm](https://github.com/nathanmarz/storm) on [Amazon EC2](http://aws.amazon.com/ec2/), written entirely in Java. Download latest release [here](https://s3-eu-west-1.amazonaws.com/storm-deploy-alternative/SDA-8Apr2014.tar.gz)
 
 _Please don't hesitate to contact me. Your feedback will help to further improve this tool._
 
@@ -40,8 +40,7 @@ _Please ensure the image resides in the same region as specified._
 ### Deploy
 Execute `java -jar storm-deploy-alternative.jar deploy CLUSTER_NAME`
 
-After successful deployment, a small file is written to $HOME/.storm/, which allows you to interact with the cluster directly from the bin/storm script. For details on how to use the bin/storm script,
-please refer to the [Storm wiki](https://github.com/nathanmarz/storm/wiki).
+After successful deployment, a small file is written to $HOME/.storm/, which allows you to interact with the cluster directly from the bin/storm script. For details on how to use the bin/storm script, please refer to the [Storm wiki](https://github.com/nathanmarz/storm/wiki).
 
 ### Attach
 Execute `java -jar storm-deploy-alternative.jar attach CLUSTER_NAME`
@@ -54,7 +53,7 @@ Execute `java -jar storm-deploy-alternative.jar scaleout CLUSTER_NAME #NumInstan
 Adds new worker instances to an already running cluster. For example, you could execute `java -jar storm-deploy-alternative.jar scaleout test 2 m1.medium`, to add two new instances of the type m1.medium to the cluster called test. When completed, you can see the new nodes in the Storm UI.
 
 ## FAQ
-+ I am seeing the error: `net.schmizz.sshj.userauth.UserAuthException: publickey auth failed`. This can happen when using multiple computers for deploying, each with different ssh keys. The solution, is to go to AWS EC2 interface -> Key Pairs, and delete the jclouds#CLUSTER_NAME keypair. To prevent this problem from happening, use the same keypair on all machines used to deploy.
++ I am seeing the error: `net.schmizz.sshj.userauth.UserAuthException: publickey auth failed`. This error means the software could not connect to the newly launched instances using SSH (for configuring them). There can be multiple reasons why this error happens. Please ensure you have ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub and that both files are _valid_. Furthermore, please go to AWS EC2 interface -> Key Pairs, and delete the jclouds#CLUSTER_NAME keypair. If deploying the same cluster, using multiple machines, please ensure the same keypair exists on all machines. In case problems persist, please try generating a new keypair by executing `ssh-keygen -t rsa`, then delete old keypair from AWS EC2 interface and retry deployment.
 + I am seeing the warning: `cipher strengths apparently limited by JCE policy`. You can improve your security by installing [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 ## Limitations
