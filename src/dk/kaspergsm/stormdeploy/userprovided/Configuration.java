@@ -6,6 +6,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.domain.Hardware;
+import org.jclouds.compute.domain.Image;
+import org.jclouds.domain.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dk.kaspergsm.stormdeploy.Tools;
@@ -17,14 +22,15 @@ import dk.kaspergsm.stormdeploy.Tools;
  */
 public class Configuration {
 	private static Logger log = LoggerFactory.getLogger(Configuration.class);
+	HashMap<Integer, String> _nodeIdToInstanceTypeID = null;
+	private String _imageID = null, _locationID = null;
 	private ArrayList<String> _conf;
 	
 	private HashSet<String> _allConfigurationSettings = new HashSet<String>(Arrays.asList(
-			"provider",
-			"provider-endpoint",
+			"provider",	"provider-endpoint",
 			"storm-version", 
 			"zk-version",
-			"image",
+			"image","image-username",
 			"region",
 			"remote-exec-preconfig",
 			"remote-exec-postconfig"));
@@ -48,11 +54,6 @@ public class Configuration {
 			return false;
 		}
 		
-		if (getProvider() == null) {
-			log.error("Provider must be specified. For instance: provider \"cloudstack\" or provider \"aws-ec2\"");
-			return false;
-		}
-		
 		if (!getProvider().equalsIgnoreCase("cloudstack") && !getProvider().equalsIgnoreCase("aws-ec2")) {
 			log.error("Only Amazon EC2 and CloudStack are supported providers");
 			return false;
@@ -63,7 +64,116 @@ public class Configuration {
 			return false;
 		}
 		
+		if (!getProvider().equalsIgnoreCase("cloudstack") && getProviderEndpoint() != null) {
+			log.error("Only specify provider endpoint, when deploying to cloudstack");
+			return false;
+		}
+		
 		return true;
+	}
+	
+	/**
+	 * Method updates configuration values to ensure either name or id can be used
+	 */
+	public void updateConfiguration(ComputeService compute) {
+		
+		// Disabled for Amazon EC2. It takes too much time to fetch information.
+		if (getProvider().equalsIgnoreCase("aws-ec2")) {
+			return;
+		}
+		
+		
+		// Check if specified image is the id or name
+		Set<? extends Image> availableImages = compute.listImages();
+		String image = getRawConfigValue("image");
+		for (Image i : availableImages) {
+			if (i.getId().equalsIgnoreCase(image)) {
+				_imageID = i.getId();
+				break;
+			}
+		}
+		if (_imageID == null) {
+			for (Image i : availableImages) {
+				if (i.getName().equalsIgnoreCase(image)) {
+					_imageID = i.getId();
+				}
+			}
+		}
+		if (_imageID == null) {
+			log.error("Specified image could not be found!");
+			System.exit(0);
+		}
+		
+		// Check if specified location is the id or name
+		Set<? extends Location> availableLocations = compute.listAssignableLocations();
+		String location = getRawConfigValue("region");
+		for (Location l : availableLocations) {
+			if (l.getId().equalsIgnoreCase(location)) {
+				_locationID = l.getId();
+				break;
+			}
+		}
+		if (_locationID == null) {
+			for (Location l : availableLocations) {
+				if (l.getDescription().equalsIgnoreCase(location)) {
+					_locationID = l.getId();
+					break;
+				}
+			}
+		}
+		if (_locationID == null) {
+			log.error("Specified region/location could not be found!");
+			System.exit(0);
+		}
+		
+		// Check if specified instancetypes are id or name 
+		Set<? extends Hardware> availableHardware = compute.listHardwareProfiles();
+		HashSet<String> instanceTypesSpecified = new HashSet<String>();
+		for (int nodeId = 0; nodeId < _conf.size(); nodeId++) {
+			if (_allConfigurationSettings.contains(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "))))
+				continue;
+			instanceTypesSpecified.add(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" ")));
+		}
+				
+		// Find all specified instancetypes which are ids
+		HashMap<String, String> instanceTypeToId = new HashMap<String, String>();
+		for (Hardware h : availableHardware) {
+			for (String curInstanceType : instanceTypesSpecified) {
+				if (h.getId().equalsIgnoreCase(curInstanceType)) {
+					instanceTypeToId.put(h.getId(), h.getId());
+				}
+			}
+		}
+		
+		// Find map from instancetypes which are names to ids
+		for (Hardware h : availableHardware) {
+			for (String curInstanceType : instanceTypesSpecified) {
+				if (instanceTypeToId.containsKey(curInstanceType))
+					continue;
+				
+				if (h.getName().equalsIgnoreCase(h.getName())) {
+					instanceTypeToId.put(h.getName(), h.getId());
+				}
+			}
+		}
+		
+		// Check all ids have been found
+		if (!instanceTypesSpecified.equals(instanceTypeToId.keySet())) {
+			log.error("Not all instancetypes could be found!");
+			System.exit(0);
+		}
+		
+		// Create nodeid to instancetype
+		_nodeIdToInstanceTypeID = new HashMap<Integer, String>();
+		for (int nodeId = 0; nodeId < _conf.size(); nodeId++) {
+			if (_allConfigurationSettings.contains(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "))))
+				continue;
+			
+			String instance = _conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "));
+			_nodeIdToInstanceTypeID.put(nodeId, instanceTypeToId.get(instance));
+		}
+		
+		log.info("Updated configuration");
 	}
 	
 	/**
@@ -97,6 +207,19 @@ public class Configuration {
 	}
 	
 	/**
+	 * Get user for logging on the image after boot
+	 */
+	public String getImageUsername() {
+		String imageUsername = getRawConfigValue("image-username");
+		
+		// If no username is specifed, assume "ubuntu"
+		if (imageUsername == null)
+			return "ubuntu";
+		
+		return imageUsername;
+	}
+	
+	/**
 	 * Get provider endpoint
 	 */
 	public String getProviderEndpoint() {
@@ -107,13 +230,22 @@ public class Configuration {
 	 * Get provider
 	 */
 	public String getProvider() {
-		return getRawConfigValue("provider");
+		String provider = getRawConfigValue("provider");
+		
+		// If no provider is specified, assume amazon ec2
+		if (provider == null)
+			return "aws-ec2";
+		
+		return provider;
 	}
 	
 	/**
 	 * Get region
 	 */
-	public String getDeploymentRegion() {
+	public String getDeploymentLocation() {
+		if (_locationID != null) {
+			return _locationID;
+		}
 		return getRawConfigValue("region");
 	}
 	
@@ -121,6 +253,9 @@ public class Configuration {
 	 * Get image
 	 */
 	public String getDeploymentImage() {
+		if (_imageID != null) {
+			return _imageID;
+		}
 		return getRawConfigValue("image");
 	}
 	
@@ -130,9 +265,9 @@ public class Configuration {
 	public String getZKLocation() {
 		String version = getRawConfigValue("zk-version");
 		if (version.equals("3.3.3")) {
-			return "s3://zk-releases/zookeeper-3.3.3.tar.gz"; 
+			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.3.3.tar.gz"; 
 		} else if (version.equals("3.4.5")) {
-			return "s3://zk-releases/zookeeper-3.4.5.tar.gz";
+			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.4.5.tar.gz";
 		} else {
 			log.info("Zookeeper version not currently supported!");
 		}
@@ -145,9 +280,9 @@ public class Configuration {
 	public String getStormRemoteLocation() {
 		String version = getRawConfigValue("storm-version");
 		if (version.equals("0.8.2")) {
-			return "s3://storm-releases/storm-0.8.2.tar.gz";
+			return "https://s3-eu-west-1.amazonaws.com/storm-releases/storm-0.8.2.tar.gz";
 		} else if (version.equals("0.9.0.1")) {
-			return "s3://storm-releases/storm-0.9.0.1.tar.gz";
+			return "https://s3-eu-west-1.amazonaws.com/storm-releases/storm-0.9.0.1.tar.gz";
 		} else {
 			log.info("Storm version " + version + " not currently supported!");
 		}
@@ -167,15 +302,20 @@ public class Configuration {
 	 * Get map{node id, instanceType}
 	 */
 	public HashMap<Integer, String> getNodeIdToInstanceType() {
-		HashMap<Integer, String> nodeIdToInstanceType = new HashMap<Integer, String>();
+		if (_nodeIdToInstanceTypeID != null) {
+			return _nodeIdToInstanceTypeID;
+		}
+		
+		// Create nodeid to instancetype
+		HashMap<Integer, String> nodeIdToInstanceTypeID = new HashMap<Integer, String>();
 		for (int nodeId = 0; nodeId < _conf.size(); nodeId++) {
 			if (_allConfigurationSettings.contains(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "))))
 				continue;
-			
+
 			String instance = _conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "));
-			nodeIdToInstanceType.put(nodeId, instance);
+			nodeIdToInstanceTypeID.put(nodeId, instance);
 		}
-		return nodeIdToInstanceType;
+		return nodeIdToInstanceTypeID;
 	}
 	
 	

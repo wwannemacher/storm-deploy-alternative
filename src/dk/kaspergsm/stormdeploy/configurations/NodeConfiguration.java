@@ -17,7 +17,7 @@ public class NodeConfiguration {
 	public static List<Statement> getCommands(String clustername, Credential credentials, Configuration config, List<String> zookeeperHostnames, String nimbusHostname, String uiHostname) {
 		List<Statement> commands = new ArrayList<Statement>();
 		
-		// Install system tools and update all packages to increase security
+		// Install system tools
 		commands.addAll(SystemTools.init(PACKAGE_MANAGER.APT));
 
 		// Install and configure s3cmd (to allow communication with Amazon S3)
@@ -25,9 +25,10 @@ public class NodeConfiguration {
 		commands.addAll(S3CMD.configure(credentials.get_ec2_identity(), credentials.get_ec2_credential()));
 		
 		// Install and configure ec2-ami-tools (only if optional x509 credentials have been defined)
-		commands.addAll(EC2Tools.install(PACKAGE_MANAGER.APT));
-		if (credentials.get_ec2_X509CertificatePath() != null && credentials.get_ec2_X509CertificatePath().length() > 0 && credentials.get_ec2_X509PrivateKeyPath() != null && credentials.get_ec2_X509PrivateKeyPath().length() > 0)
-			commands.addAll(EC2Tools.configure(credentials.get_ec2_X509CertificatePath(), credentials.get_ec2_X509PrivateKeyPath(), config.getDeploymentRegion(), clustername));			
+		if (credentials.get_ec2_X509CertificatePath() != null && credentials.get_ec2_X509CertificatePath().length() > 0 && credentials.get_ec2_X509PrivateKeyPath() != null && credentials.get_ec2_X509PrivateKeyPath().length() > 0) {
+			commands.addAll(EC2Tools.install(PACKAGE_MANAGER.APT));
+			commands.addAll(EC2Tools.configure(credentials.get_ec2_X509CertificatePath(), credentials.get_ec2_X509PrivateKeyPath(), config.getDeploymentLocation(), clustername));
+		}
 		
 		// Conditional - Download and configure ZeroMQ (including jzmq binding)
 		commands.addAll(ZeroMQ.download());
@@ -68,17 +69,17 @@ public class NodeConfiguration {
 		/**
 		 * Start daemons (only on correct nodes, and under supervision)
 		 */
-		commands.addAll(Zookeeper.startDaemonSupervision());
-		commands.addAll(Storm.startNimbusDaemonSupervision());
-		commands.addAll(Storm.startSupervisorDaemonSupervision());
-		commands.addAll(Storm.startUIDaemonSupervision());
+		commands.addAll(Zookeeper.startDaemonSupervision(config.getImageUsername()));
+		commands.addAll(Storm.startNimbusDaemonSupervision(config.getImageUsername()));
+		commands.addAll(Storm.startSupervisorDaemonSupervision(config.getImageUsername()));
+		commands.addAll(Storm.startUIDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Ganglia.start());
 		
 		/**
-		 * Start memory manager (to sharing of resources among Java processes)
+		 * Start memory manager (to help share resources among Java processes)
 		 * 	requires StormDeployAlternative is installed remotely
 		 */
-		commands.addAll(StormDeployAlternative.runMemoryMonitor());
+		commands.addAll(StormDeployAlternative.runMemoryMonitor(config.getImageUsername()));
 		
 		// Return commands
 		return commands;

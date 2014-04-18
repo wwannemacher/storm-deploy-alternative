@@ -36,21 +36,21 @@ public class Zookeeper {
 		return st;
 	}
 	
-	public static List<Statement> writeZKMyIds(Integer zkid) {
+	public static List<Statement> writeZKMyIds(String username, Integer zkid) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("mkdir -p /tmp/zktmp"));												// ensure folders exist
-		st.add(exec("chown ubuntu /tmp/zktmp"));
-		st.add(exec("echo " + zkid + " > /tmp/zktmp/myid"));								// write myid (annoying but needed by ZK)
+		st.add(exec("chown " + username + " /tmp/zktmp"));
+		st.add(exec("echo " + zkid + " > /tmp/zktmp/myid"));								// write myid
 		return st;
 	}
 	
 	/**
 	 * Uses Monitor to restart daemon, if it stops
 	 */
-	public static List<Statement> startDaemonSupervision() {
+	public static List<Statement> startDaemonSupervision(String username) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~"));
-		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *ZK*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor org.apache.zookeeper.server zookeeper/bin/zkServer.sh start ;; esac &' - ubuntu"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *ZK*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor org.apache.zookeeper.server zookeeper/bin/zkServer.sh start ;; esac &' - " + username));
 		return st;
 	}
 }

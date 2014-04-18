@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dk.kaspergsm.stormdeploy.commands.Attach;
 import dk.kaspergsm.stormdeploy.commands.Deploy;
-import dk.kaspergsm.stormdeploy.commands.GetLogs;
-import dk.kaspergsm.stormdeploy.commands.Print;
 import dk.kaspergsm.stormdeploy.commands.ScaleOutCluster;
 import dk.kaspergsm.stormdeploy.userprovided.Configuration;
 import dk.kaspergsm.stormdeploy.userprovided.Credential;
@@ -25,8 +23,6 @@ public class StormDeployAlternative {
 			log.error("Wrong arguments provided, the following is supported:");
 			log.error(" deploy CLUSTERNAME");
 			log.error(" attach CLUSTERNAME");
-			log.error(" getlog CLUSTERNAME");
-			log.error(" print CLUSTERNAME");
 			log.error(" scaleout CLUSTERNAME #InstancesToAdd InstanceType");
 			System.exit(0);
 		}
@@ -75,13 +71,19 @@ public class StormDeployAlternative {
 		
 		
 		/**
+		 * Update configuration
+		 */
+		config.updateConfiguration(computeContext.getComputeService());
+		
+		
+		/**
 		 * Execute specified operation now
 		 */
-		if (operation.trim().toLowerCase().equals("deploy")) {
+		if (operation.trim().equalsIgnoreCase("deploy")) {
 			
 			Deploy.deploy(clustername, credentials, config, computeContext);
 			
-		} else if (operation.trim().toLowerCase().equals("scaleout")) {
+		} else if (operation.trim().equalsIgnoreCase("scaleout")) {
 			
 			try {
 				int newNodes = Integer.valueOf(args[2]);
@@ -92,18 +94,10 @@ public class StormDeployAlternative {
 				return;
 			}
 			
-		} else if (operation.trim().toLowerCase().equals("attach")) {
+		} else if (operation.trim().equalsIgnoreCase("attach")) {
 			
 			Attach.attach(clustername, computeContext);
 		
-		} else if (operation.trim().toLowerCase().equals("getlog")) {
-			
-			GetLogs.run(clustername, computeContext);
-		
-		} else if (operation.trim().toLowerCase().equals("print")) {
-			
-			Print.run(clustername, computeContext);
-				
 		} else {
 			log.error("Unsupported operation " + operation);
 		}

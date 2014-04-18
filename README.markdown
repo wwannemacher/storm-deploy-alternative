@@ -1,6 +1,9 @@
-Fast tool to deploy [Storm](https://github.com/nathanmarz/storm) on [Amazon EC2](http://aws.amazon.com/ec2/), written entirely in Java. Download latest release [here](https://s3-eu-west-1.amazonaws.com/storm-deploy-alternative/SDA-8Apr2014.tar.gz)
+Fast tool to deploy [Storm](https://github.com/apache/incubator-storm) on [Amazon EC2](http://aws.amazon.com/ec2/), written entirely in Java. Download latest stable release [here](https://s3-eu-west-1.amazonaws.com/storm-deploy-alternative/SDA-8Apr2014.tar.gz).
 
 _Please don't hesitate to contact me. Your feedback will help to further improve this tool._
+
+## Notice
+I am working on adding support for deploying on [Apache CloudStack](http://cloudstack.apache.org/). I have had to change the credential specification a bit. When updating to the newest version, please change your credential.yaml according to credential_example.yaml.
 
 ## Features
 + Runs Storm and Zookeeper daemons under supervision (automatically restarted in case of failure)
@@ -13,7 +16,7 @@ _Please don't hesitate to contact me. Your feedback will help to further improve
 + Supports Storm versions: _0.8.2_ & _0.9.0.1_
 
 ## Configuration
-This tool, requires two configurationfiles: `conf/credential.yaml` and `conf/configuration.yaml`. Put your Amazon Web Services (AWS) credentials into the file `conf/credential.yaml`. 
+This tool, requires two configurationfiles: `conf/credential.yaml` and `conf/configuration.yaml`. Put your credentials into the file `conf/credential.yaml`. 
 
 Below is an example of a single cluster configuration, for `conf/configuration.yaml`
 

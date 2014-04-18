@@ -13,6 +13,7 @@ import static org.jclouds.scriptbuilder.domain.Statements.exec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dk.kaspergsm.stormdeploy.configurations.Zookeeper;
+import dk.kaspergsm.stormdeploy.userprovided.Configuration;
 
 /**
  * Used to launch a new nodes
@@ -21,7 +22,7 @@ import dk.kaspergsm.stormdeploy.configurations.Zookeeper;
  */
 public class LaunchNodeThread extends Thread {
 	private static Logger log = LoggerFactory.getLogger(LaunchNodeThread.class);
-	private String _instanceType, _clustername, _region, _image;
+	private String _instanceType, _clustername, _region, _image, _username;
 	private Set<NodeMetadata> _newNodes = null;
 	private List<Statement> _initScript;
 	private ComputeService _compute;
@@ -46,22 +47,21 @@ public class LaunchNodeThread extends Thread {
 	 * @param zkMyId
 	 *            If contain(daemons, zk) then write this zkMyId on init
 	 */
-	public LaunchNodeThread(ComputeService compute, String instanceType, String image, String region,
-			String clustername, List<Integer> nodeids, List<String> daemons, Integer zkMyId) {
-
+	public LaunchNodeThread(ComputeService compute, Configuration config, String instanceType, String clustername, List<Integer> nodeids, List<String> daemons, Integer zkMyId) {
+		_region = config.getDeploymentLocation();
+		_username = config.getImageUsername();
+		_image = config.getDeploymentImage();
 		_instanceType = instanceType;
 		_clustername = clustername;
 		_daemons = daemons;
 		_compute = compute;
 		_nodeids = nodeids;
-		_region = region;
-		_image = image;
-
+		
 		// Create initScript
 		_initScript = new ArrayList<Statement>();
 		_initScript.add(exec("echo \"" + daemons.toString() + "\" > ~/daemons"));
 		if (zkMyId != null)
-			_initScript.addAll(Zookeeper.writeZKMyIds(zkMyId));
+			_initScript.addAll(Zookeeper.writeZKMyIds(_username, zkMyId));
 
 		// Run thread now
 		this.start();
@@ -82,11 +82,11 @@ public class LaunchNodeThread extends Thread {
 									new TemplateOptions()
 											.runAsRoot(false)
 											.wrapInInitScript(true)
-											.overrideLoginUser("ubuntu")
+											.overrideLoginUser(_username)
 											.inboundPorts(Tools.getPortsToOpen())
 											.userMetadata("daemons", _daemons.toString())
 											.runScript(new StatementList(_initScript))
-											.overrideLoginCredentials(Tools.getPrivateKeyCredentials())
+											.overrideLoginCredentials(Tools.getPrivateKeyCredentials(_username))
 											.authorizePublicKey(Tools.getPublicKey())).build());
 		} catch (RunNodesException ex) {
 			log.error("Problem launching instance", ex);

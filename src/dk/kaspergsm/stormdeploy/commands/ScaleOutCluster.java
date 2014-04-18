@@ -81,7 +81,8 @@ public class ScaleOutCluster {
 					numInstances, 
 					image, 
 					region, 
-					computeContext);		
+					computeContext,
+					config);		
 		
 		
 		/**
@@ -93,7 +94,7 @@ public class ScaleOutCluster {
 		/**
 		 * Print final info
 		 */
-		log.info("User: ubuntu");
+		log.info("User: " + config.getImageUsername());
 		log.info("Started:");
 		for (NodeMetadata n : newWorkerNodes)
 			log.info("\t" + n.getPublicAddresses().iterator().next() + "\t" + "[WORKER]");
@@ -113,7 +114,7 @@ public class ScaleOutCluster {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static Set<NodeMetadata> startWorkerNodesNow(String clustername, List<Statement> commands, String instanceType, int numInstances, String image, String region, ComputeServiceContext computeContext) {
+	private static Set<NodeMetadata> startWorkerNodesNow(String clustername, List<Statement> commands, String instanceType, int numInstances, String image, String region, ComputeServiceContext computeContext, Configuration config) {
 		try {
 			
 			// Create initScript
@@ -131,10 +132,10 @@ public class ScaleOutCluster {
 						.blockOnComplete(true)
 						.wrapInInitScript(true)
 						.inboundPorts(22, 6627, 8080) // 22 = SSH, 6627 = Thrift, 8080 = UI
-						.overrideLoginUser("ubuntu")
+						.overrideLoginUser(config.getImageUsername())
 						.userMetadata("daemons", "[WORKER]")
 						.runScript(new StatementList(initScript))
-						.overrideLoginCredentials(Tools.getPrivateKeyCredentials())
+						.overrideLoginCredentials(Tools.getPrivateKeyCredentials(config.getImageUsername()))
 						.authorizePublicKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"), Charsets.UTF_8)));
 			return (Set<NodeMetadata>) computeContext.getComputeService().createNodesInGroup(clustername, numInstances, templateBuilder.build());
 		} catch (IllegalArgumentException ex) {

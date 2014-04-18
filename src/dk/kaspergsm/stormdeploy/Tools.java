@@ -60,9 +60,9 @@ public class Tools {
 	/**
 	 * Get login credentials (contains private ssh key)
 	 */
-	public static LoginCredentials getPrivateKeyCredentials() {
+	public static LoginCredentials getPrivateKeyCredentials(String username) {
 		try {
-			String user = "ubuntu";
+			String user = username;
 			String privateKey = Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa"), UTF_8);
 			return LoginCredentials.builder().user(user).authenticateSudo(true).privateKey(privateKey).build();
 		} catch (Exception ex) {
@@ -125,15 +125,15 @@ public class Tools {
 	/**
 	 * Run set of queued commands now
 	 */
-	public static void executeOnNodes(List<Statement> commands, boolean runAsRoot, String clustername, ComputeService compute) throws RunScriptOnNodesException, InterruptedException, ExecutionException, TimeoutException {
+	public static void executeOnNodes(List<Statement> commands, boolean runAsRoot, String clustername, ComputeService compute, String username) throws RunScriptOnNodesException, InterruptedException, ExecutionException, TimeoutException {
 		compute.runScriptOnNodesMatching(
 				NodePredicates.runningInGroup(clustername),
 				new StatementList(commands),
 				new RunScriptOptions()
 					.nameTask("Setup")
-				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials())
+				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username))
 				 	.wrapInInitScript(true)
-				 	.overrideLoginUser("ubuntu")
+				 	.overrideLoginUser(username)
 				 	.blockOnComplete(true)
 				 	.runAsRoot(runAsRoot));
 	}
@@ -204,24 +204,30 @@ public class Tools {
 			st.add(exec("echo \"" + l.replace("\"", "\\\"") + "\" >> " + remotePath));
 		return st;
 	}
-	
+		
 	/**
 	 * Download, extract and then remove
+	 * RemotePath should always be downloadable by wget
 	 */
 	public static List<Statement> download(String localPath, String remotePath, boolean extract, boolean delete) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd " + localPath));
-		if (remotePath.startsWith("s3://")) {
-			st.add(exec("s3cmd get " + remotePath));
-		} else {
-			st.add(exec("wget " + remotePath));	
+		
+		// Extract filename
+		String filename = remotePath.substring(remotePath.lastIndexOf("/") + 1);
+		
+		// Download file
+		st.add(exec("wget -N " + remotePath));
+		
+		// Extract file
+		if (extract) {
+			st.add(exec("tar -zxf " + filename));
 		}
 		
-		String fileName = remotePath.substring(remotePath.lastIndexOf("/") + 1);
-		if (extract)
-			st.add(exec("tar -zxf " + fileName));
-		if (delete)
-			st.add(exec("rm " + fileName));
+		// Delete file
+		if (delete) {
+			st.add(exec("rm " + filename));
+		}
 		return st;
 	}
 	

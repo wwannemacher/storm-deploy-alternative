@@ -1,24 +1,31 @@
-# Must contain: ZK>=1, MASTER=1, WORKER>=1 (maximally one per instance)
-# Optionally UI<=1
 #
-# EC2 Instancetypes
-# 	t1.micro;
-#	m1.{small, medium, large, xlarge}
-#	c1.{medium, xlarge}
-#	m2.{xlarge, 2xlarge, 4xlarge}
-#	hi1.{4xlarge}
-#	cc1.{4xlarge}
-#	cg1.{4xlarge}
-#	cc2.{8xlarge}
-
-mycluster:
-    - m1.medium {ZK, WORKER, MASTER, UI}
-    - m1.medium {ZK, WORKER}
-    - m1.medium {ZK, WORKER}
-    - m1.medium {WORKER}
-    - storm-version "0.8.2"
-    - zk-version "3.3.3"
-    - image "eu-west-1/ami-480bea3f"
-    - region "eu-west-1"
+# Amazon EC2 example cluster configuration
+#
+eccTest:
+    - provider "aws-ec2"					# Optional - default value "aws-ec2"
+    - storm-version "0.8.2"					# Version of Storm
+    - zk-version "3.3.3"					# Version of Zookeeper
+    - image "eu-west-1/ami-480bea3f"				# Template
+    - region "eu-west-1"					# Region
+    - m1.medium {ZK, WORKER, MASTER, UI}			# Request service
+    - m1.medium {ZK, WORKER}					# Request service
+    - m1.medium {ZK, WORKER}					# Request service
+    - m1.medium {WORKER}					# Request service
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
+
+#
+# CloudStack example cluster configurations
+#
+csTest:
+    - provider "cloudstack"
+    - provider-endpoint "http://XX.XX.XX.XX:8080/client/api"
+    - storm-version "0.8.2"					# Version of Storm
+    - zk-version "3.3.3"					# Version of Zookeeper
+    - image "Ubuntu 13.10 (64 bit)" 				# Template
+    - image-username "cloud"					# Optional - default value "ubuntu"
+    - region "ZoneOne" 						# Zone
+    - 1/2 {MASTER,ZK,UI,WORKER} 				# Request service
+    - remote-exec-preconfig {}
+    - remote-exec-postconfig {cd ~, echo hey > hey.txt}
+

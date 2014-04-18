@@ -95,7 +95,8 @@ public class Deploy {
 							getUINode(config, newNodes).getPrivateAddresses().iterator().next()),
 					true,
 					clustername, 
-					computeContext.getComputeService());
+					computeContext.getComputeService(),
+					config.getImageUsername());
 		} catch (RunScriptOnNodesException ex) {
 			log.error("Problem configuring instance(s)", ex);
 		} catch (InterruptedException ex) {
@@ -110,7 +111,7 @@ public class Deploy {
 		/**
 		 * Print final info
 		 */
-		log.info("User: ubuntu");
+		log.info("User: " + config.getImageUsername());
 		log.info("Started:");
 		for (NodeMetadata n : newNodes.values())
 			log.info("\t" + n.getPublicAddresses().iterator().next() + "\t" + n.getUserMetadata().get("daemons").toString());
@@ -195,9 +196,8 @@ public class Deploy {
 						log.info("Starting 1 instance of type " + instanceType + " with daemons " + daemonsToNodeIds.getKey().toString());
 						workerThreads.add(new LaunchNodeThread(
 								compute,
+								config,
 								instanceType, 
-								config.getDeploymentImage(), 
-								config.getDeploymentRegion(), 
 								clustername, 
 								new ArrayList<Integer>(Arrays.asList(nodeIdToStartWithZK)),
 								daemonsToNodeIds.getKey(), config.getNodeIdToZkId().get(nodeIdToStartWithZK)));
@@ -207,9 +207,8 @@ public class Deploy {
 					log.info("Starting " + instanceTypeToNodeIdsToStart.get(instanceType).size() + " instance(s) of type " + instanceType + " with daemons " + daemonsToNodeIds.getKey().toString());
 					workerThreads.add(new LaunchNodeThread(
 							compute, 
+							config,
 							instanceType, 
-							config.getDeploymentImage(), 
-							config.getDeploymentRegion(), 
 							clustername, 
 							instanceTypeToNodeIdsToStart.get(instanceType), 
 							daemonsToNodeIds.getKey(), null));	
