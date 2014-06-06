@@ -2,9 +2,10 @@ package dk.kaspergsm.stormdeploy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -60,6 +61,7 @@ public class LaunchNodeThread extends Thread {
 		// Create initScript
 		_initScript = new ArrayList<Statement>();
 		_initScript.add(exec("echo \"" + daemons.toString() + "\" > ~/daemons"));
+		_initScript.add(exec("echo \"" + instanceType.toString() + "\" > ~/.instance-type"));
 		if (zkMyId != null)
 			_initScript.addAll(Zookeeper.writeZKMyIds(_username, zkMyId));
 
@@ -88,7 +90,18 @@ public class LaunchNodeThread extends Thread {
 											.runScript(new StatementList(_initScript))
 											.overrideLoginCredentials(Tools.getPrivateKeyCredentials(_username))
 											.authorizePublicKey(Tools.getPublicKey())).build());
-		} catch (RunNodesException ex) {
+		} catch (NoSuchElementException ex) {
+			// happens often when hardwareId is not found. List all possible hardware types
+			if (ex.getMessage().toLowerCase().contains("hardwareid") && ex.getMessage().toLowerCase().contains("not found")) {
+				log.error("You have specified unknown hardware profile. Here follows a list of supported profiles: ");
+				Set<? extends Hardware> availableHardware = _compute.listHardwareProfiles();
+				for (Hardware h : availableHardware) {
+					log.info(h.toString());
+				}
+			} else {
+				log.error("Problem: ", ex);	
+			}
+		} catch (Exception ex) {
 			log.error("Problem launching instance", ex);
 		}
 	}

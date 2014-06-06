@@ -1,12 +1,15 @@
 package dk.kaspergsm.stormdeploy.configurations;
 
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jclouds.scriptbuilder.domain.Statement;
+
 import dk.kaspergsm.stormdeploy.Tools;
 
 
@@ -28,10 +31,20 @@ public class Storm {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~/storm/conf/"));
 		st.add(exec("touch storm.yaml"));
+		
+		// Add nimbus.host
 		st.add(exec("echo nimbus.host: \"" + hostname + "\" >> storm.yaml"));
+		
+		// Add storm.zookeeper.servers
 		st.add(exec("echo storm.zookeeper.servers: >> storm.yaml"));
 		for (int i = 1; i <= zkNodesHostname.size(); i++)
 			st.add(exec("echo - \"" + zkNodesHostname.get(i-1) + "\" >> storm.yaml"));
+		
+		// Add supervisor metadata
+		st.add(exec("echo supervisor.scheduler.meta: >> storm.yaml"));
+		st.add(exec("instancetype=$(cat ~/.instance-type)"));
+		st.add(exec("echo \"  instancetype: \\\"$instancetype\\\"\" >> storm.yaml"));
+		
 		return st;
 	}
 	
