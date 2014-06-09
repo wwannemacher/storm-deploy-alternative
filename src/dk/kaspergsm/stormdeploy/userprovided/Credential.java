@@ -39,15 +39,23 @@ public class Credential {
 		if (credentials.containsKey("ec2-x509-certificate-path") && ((String)credentials.get("ec2-x509-certificate-path")).length() > 0) {
 			_x509certPathEC2 = (String)credentials.get("ec2-x509-certificate-path");
 			if (!new File(_x509certPathEC2).exists()) {
-				log.error("Invalid ec2-x509-certificate-path. File not found!");
-				System.exit(0);
+				if (new File(Tools.getHomeDir() + ".ec2/cert.pem").exists()) {
+					_x509certPathEC2 = Tools.getHomeDir() + ".ec2/cert.pem";
+				} else {
+					log.error("Invalid ec2-x509-certificate-path. File not found!");
+					System.exit(0);	
+				}
 			}
 		}
 		if (credentials.containsKey("ec2-x509-private-path")  && ((String)credentials.get("ec2-x509-private-path")).length() > 0) {
 			_x509pkPathEC2 = (String)credentials.get("ec2-x509-private-path");
 			if (!new File(_x509pkPathEC2).exists()) {
-				log.error("Invalid ec2-x509-private-path. File not found!");
-				System.exit(0);
+				if (new File(Tools.getHomeDir() + ".ec2/priv.pem").exists()) {
+					_x509pkPathEC2 = Tools.getHomeDir() + ".ec2/priv.pem";
+				} else {
+					log.error("Invalid ec2-x509-private-path. File not found!");
+					System.exit(0);	
+				}
 			}
 		}
 		
