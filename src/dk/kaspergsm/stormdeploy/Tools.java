@@ -201,7 +201,7 @@ public class Tools {
 	public static List<Statement> echoFile(String localPath, String remotePath) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		for (String l : readFile(localPath).split("\n"))
-			st.add(exec("echo \"" + l.replace("\"", "\\\"") + "\" >> " + remotePath));
+			st.add(exec("echo '" + l + "' >> " + remotePath));
 		return st;
 	}
 		
