@@ -45,6 +45,11 @@ Execute `java -jar storm-deploy-alternative.jar deploy CLUSTER_NAME`
 
 After successful deployment, a small file is written to $HOME/.storm/, which allows you to interact with the cluster directly from the bin/storm script. For details on how to use the bin/storm script, please refer to the [Storm wiki](https://github.com/nathanmarz/storm/wiki).
 
+### Kill
+Execute `java -jar storm-deploy-alternative.jar kill CLUSTER_NAME`
+
+Kills all nodes belonging in the cluster with name CLUSTER_NAME.
+
 ### Attach
 Execute `java -jar storm-deploy-alternative.jar attach CLUSTER_NAME`
 
