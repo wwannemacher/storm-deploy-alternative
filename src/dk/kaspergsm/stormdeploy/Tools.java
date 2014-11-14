@@ -61,10 +61,12 @@ public class Tools {
 	 * Get login credentials (contains private ssh key)
 	 */
 	public static LoginCredentials getPrivateKeyCredentials(String username) {
-		try {
-			String user = username;
-			String privateKey = Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa"), UTF_8);
-			return LoginCredentials.builder().user(user).authenticateSudo(true).privateKey(privateKey).build();
+		try {			
+			return LoginCredentials.builder()
+					.user(username)
+					.authenticateSudo(true)
+					.privateKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa"), UTF_8))
+					.build();
 		} catch (Exception ex) {
 			log.error("Error reading ssh keys", ex);
 			System.exit(0);
@@ -131,7 +133,7 @@ public class Tools {
 				new StatementList(commands),
 				new RunScriptOptions()
 					.nameTask("Setup")
-				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username))
+				 	//.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username))
 				 	.wrapInInitScript(true)
 				 	.overrideLoginUser(username)
 				 	.blockOnComplete(true)

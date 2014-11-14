@@ -34,7 +34,7 @@ public class StormDeployAlternative {
 		 * Parse
 		 */
 		String operation = args[0];
-		String clustername = args[1];
+		String clustername = args[1].toLowerCase();
 		Configuration config = Configuration.fromYamlFile(new File(Tools.getWorkDir() + "conf" + File.separator + "configuration.yaml"), clustername);
 		Credential credentials = new Credential(new File(Tools.getWorkDir() + "conf" + File.separator + "credential.yaml"));
 

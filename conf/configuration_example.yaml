@@ -1,7 +1,7 @@
 #
 # Amazon EC2 example cluster configuration
 #
-eccTest:
+ectwo:
     - provider "aws-ec2"					# Optional - default value "aws-ec2"
     - storm-version "0.8.2"					# Version of Storm
     - zk-version "3.3.3"					# Version of Zookeeper
@@ -17,7 +17,7 @@ eccTest:
 #
 # CloudStack example cluster configurations
 #
-csTest:
+cs:
     - provider "cloudstack"
     - provider-endpoint "http://XX.XX.XX.XX:8080/client/api"
     - storm-version "0.8.2"					# Version of Storm
