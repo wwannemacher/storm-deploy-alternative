@@ -21,7 +21,7 @@ import dk.kaspergsm.stormdeploy.Tools;
 public class Storm {
 
 	public static List<Statement> download(String stormRemoteLocation) {
-        return Tools.download("~", stormRemoteLocation, true, true);
+        return Tools.download("~/", stormRemoteLocation, true, true, "storm");
 	}
 	
 	/**

@@ -20,6 +20,13 @@ public class NodeConfiguration {
 		// Install system tools
 		commands.addAll(SystemTools.init(PACKAGE_MANAGER.APT));
 
+		// Configure IAM credentials
+		// FIXME: this is lame.  Want to use an IAM role for the machines
+		// but jclouds doesn't support IAM yet.  Can probably make it works
+		// using: https://github.com/jclouds/jclouds-labs-aws/blob/jclouds-labs-aws-1.8.1/iam/src/test/java/org/jclouds/iam/features/RolePolicyApiLiveTest.java
+		// but there are no docs yet and I've wasted too much time messing with already.
+		commands.addAll(AWSCredentials.configure(config.getDeploymentLocation(), credentials.get_ec2_identity(), credentials.get_ec2_credential()));
+		
 		// Install and configure s3cmd (to allow communication with Amazon S3)
 		commands.addAll(S3CMD.install(PACKAGE_MANAGER.APT));
 		commands.addAll(S3CMD.configure(credentials.get_ec2_identity(), credentials.get_ec2_credential()));

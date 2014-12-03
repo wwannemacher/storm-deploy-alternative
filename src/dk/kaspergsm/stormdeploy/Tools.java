@@ -206,12 +206,16 @@ public class Tools {
 			st.add(exec("echo '" + l + "' >> " + remotePath));
 		return st;
 	}
-		
+	
+	public static List<Statement> download(String localPath, String remotePath, boolean extract, boolean delete) {
+		return download(localPath, remotePath, extract, delete, null);
+	}
+	
 	/**
-	 * Download, extract and then remove
+	 * Download, extract, remove and rename if necessary
 	 * RemotePath should always be downloadable by wget
 	 */
-	public static List<Statement> download(String localPath, String remotePath, boolean extract, boolean delete) {
+	public static List<Statement> download(String localPath, String remotePath, boolean extract, boolean delete, String finalName) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd " + localPath));
 		
@@ -229,6 +233,15 @@ public class Tools {
 		// Delete file
 		if (delete) {
 			st.add(exec("rm " + filename));
+		}
+		
+		if (finalName != null) {
+			 int index = filename.lastIndexOf(".tar");
+			 if (index > 0) {
+				 filename = filename.substring(0, filename.lastIndexOf(".tar"));
+			 }
+			 String testAndMove = "[ ! -e " + finalName + " ] && mv " + filename + " " + finalName;
+			 st.add(exec(testAndMove));
 		}
 		return st;
 	}
