@@ -31,6 +31,7 @@ public class SystemTools {
 			
 			// Init apt
 			st.add(exec("apt-get update -y"));
+			st.add(exec("apt-get upgrade -y"));
 			
 			// Install JDK (OpenJDK 7)
 			st.add(exec("apt-get install -y openjdk-7-jdk"));
@@ -44,9 +45,7 @@ public class SystemTools {
 			st.add(exec("apt-get install -y git"));
 			
 			// Install build-tools
-			st.add(exec("apt-get install -y gcc"));
-			st.add(exec("apt-get install -y gcc++"));
-			st.add(exec("apt-get install -y make"));
+			st.add(exec("apt-get install -y build-essential"));
 			st.add(exec("apt-get install -y uuid-dev"));
 			st.add(exec("apt-get install -y pkg-config"));
 			st.add(exec("apt-get install -y libtool"));
