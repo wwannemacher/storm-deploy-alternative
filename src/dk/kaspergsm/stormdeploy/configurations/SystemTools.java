@@ -31,7 +31,7 @@ public class SystemTools {
 			
 			// Init apt
 			st.add(exec("apt-get update -y"));
-			st.add(exec("apt-get upgrade -y"));
+			//st.add(exec("apt-get upgrade -y")); - user can add to remote-exec-preconfig if needed
 			
 			// Install JDK (OpenJDK 7)
 			st.add(exec("apt-get install -y openjdk-7-jdk"));

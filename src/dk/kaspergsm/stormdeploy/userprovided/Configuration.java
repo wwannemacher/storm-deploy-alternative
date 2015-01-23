@@ -269,7 +269,7 @@ public class Configuration {
 		} else if (version.equals("3.4.5")) {
 			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.4.5.tar.gz";
 		} else if (version.equals("3.4.6")) {
-			return "http://tweedo.com/mirror/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz";
+			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.4.6.tar.gz";
 		} else {
 			log.info("Zookeeper version not currently supported!");
 		}
@@ -288,7 +288,7 @@ public class Configuration {
 		} else if (version.equals("0.9.2")) {
 			return "https://s3-eu-west-1.amazonaws.com/storm-releases/apache-storm-0.9.2-incubating.tar.gz";
 		} else if (version.equals("0.9.3")) {
-			return "http://tweedo.com/mirror/apache/storm/apache-storm-0.9.3/apache-storm-0.9.3.tar.gz";
+			return "https://s3-eu-west-1.amazonaws.com/storm-releases/apache-storm-0.9.3.tar.gz";
 		} else {
 			log.info("Storm version " + version + " not currently supported!");
 		}
