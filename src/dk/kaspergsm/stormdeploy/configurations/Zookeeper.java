@@ -14,7 +14,7 @@ import dk.kaspergsm.stormdeploy.Tools;
 public class Zookeeper {
 
 	public static List<Statement> download(String zookeeperRemoteLocation) {
-		return Tools.download("~", zookeeperRemoteLocation, true, true);
+		return Tools.download("~/", zookeeperRemoteLocation, true, true, "zookeeper");
 	}
 
 	public static List<Statement> configure(List<String> zkNodesHostnames) {
@@ -30,6 +30,8 @@ public class Zookeeper {
 				sb.append("\\n"); // escaped newline
 		}
 		st.add(exec("cd ~/zookeeper/conf/"));
+		st.add(exec("[ ! -e zoo.cfg ] && cp zoo_sample.cfg zoo.cfg && echo -e \"# the zookeeper ensemble\nserver.x\" >> zoo.cfg"));
+		st.add(exec("sed \"s|dataDir=.*|dataDir=/tmp/zktmp|\" -i \"zoo.cfg\""));	// set dataDir to /tmp/zktmp
 		st.add(exec("sed \"s/server.*/server.x/\" -i \"zoo.cfg\""));				// convert each serverline to server.x
 		st.add(exec("sed '$!N; /^\\(.*\\)\\n\\1$/!P; D' -i \"zoo.cfg\""));			// delete duplicate lines => one server.x
 		st.add(exec("sed \"s/server.x/" + sb.toString() + "/\" -i \"zoo.cfg\""));	// replace server.x with new lines

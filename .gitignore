@@ -1,0 +1,8 @@
+/target/
+.classpath
+.project
+.settings
+conf/configuration.yaml
+conf/credential.yaml
+dependency-reduced-pom.xml
+memory-monitor.log
