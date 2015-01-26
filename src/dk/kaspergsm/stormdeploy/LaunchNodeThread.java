@@ -88,7 +88,7 @@ public class LaunchNodeThread extends Thread {
 											.inboundPorts(Tools.getPortsToOpen())
 											.userMetadata("daemons", _daemons.toString())
 											.runScript(new StatementList(_initScript))
-											//.overrideLoginCredentials(Tools.getPrivateKeyCredentials(_username))
+											.overrideLoginCredentials(Tools.getPrivateKeyCredentials(_username))
 											.authorizePublicKey(Tools.getPublicKey())).build());
 		} catch (NoSuchElementException ex) {
 			// happens often when hardwareId is not found. List all possible hardware types

@@ -64,8 +64,8 @@ public class Tools {
 		try {			
 			return LoginCredentials.builder()
 					.user(username)
-					.authenticateSudo(true)
-					.privateKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa"), UTF_8))
+					.authenticateSudo(false)
+					.privateKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa"), UTF_8).trim())
 					.build();
 		} catch (Exception ex) {
 			log.error("Error reading ssh keys", ex);
@@ -79,7 +79,7 @@ public class Tools {
 	 */
 	public static String getPublicKey() {
 		try {
-			return Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"), UTF_8);
+			return Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"), UTF_8).trim();
 		} catch (IOException ex) {
 			log.error("Error reading ssh keys", ex);
 			System.exit(0);
@@ -133,7 +133,7 @@ public class Tools {
 				new StatementList(commands),
 				new RunScriptOptions()
 					.nameTask("Setup")
-				 	//.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username))
+				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username))
 				 	.wrapInInitScript(true)
 				 	.overrideLoginUser(username)
 				 	.blockOnComplete(true)
