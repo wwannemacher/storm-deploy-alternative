@@ -27,7 +27,7 @@ public class Storm {
 	/**
 	 * Write storm/conf/storm.yaml (basic settings only)
 	 */
-	public static List<Statement> configure(String hostname, List<String> zkNodesHostname) {
+	public static List<Statement> configure(String hostname, List<String> zkNodesHostname, String userName) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~/storm/conf/"));
 		st.add(exec("touch storm.yaml"));
@@ -45,6 +45,12 @@ public class Storm {
 		st.add(exec("instancetype=$(cat ~/.instance-type)"));
 		st.add(exec("echo \"  instancetype: \\\"$instancetype\\\"\" >> storm.yaml"));
 		
+		// Change owner of storm directory
+		st.add(exec("chown -R " + userName + ":" + userName + " ~/storm"));
+		
+		// Add storm to execution PATH
+		st.add(exec("echo \"export PATH=\\\"\\$HOME/storm/bin:\\$PATH\\\"\" >> ~/.bashrc"));
+                
 		return st;
 	}
 	
