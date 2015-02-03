@@ -84,6 +84,16 @@ public class Storm {
 		return st;
 	}
 	
+    /**
+     * Uses Monitor to restart daemon, if it stops
+     */
+	public static List<Statement> startLogViewerDaemonSupervision(String username) {
+		ArrayList<Statement> st = new ArrayList<Statement>();
+		st.add(exec("cd ~"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *LOGVIEWER*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.daemon.logviewer storm/bin/storm logviewer ;; esac &' - " + username));
+		return st;
+	}
+	
 	/**
 	 * Used to write config files to $HOME/.storm/
 	 * these are needed for the storm script to know where to submit topologies etc.

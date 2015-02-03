@@ -80,6 +80,7 @@ public class NodeConfiguration {
 		commands.addAll(Storm.startNimbusDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Storm.startSupervisorDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Storm.startUIDaemonSupervision(config.getImageUsername()));
+		commands.addAll(Storm.startLogViewerDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Ganglia.start());
 		
 		/**

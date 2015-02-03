@@ -33,6 +33,7 @@ mycluster:
 ```
 + WORKER is the Storm Supervisor daemon
 + MASTER is the Storm Nimbus daemon
++ LOGVIEWER is the Storm Logviewer daemon
 + UI is the Storm and Ganglia User-Interface
 + ZK is the [Zookeeper](http://zookeeper.apache.org) daemon
 
