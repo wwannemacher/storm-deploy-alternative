@@ -18,12 +18,7 @@
 		<dependency>
 			<groupId>org.apache.jclouds</groupId>
 			<artifactId>jclouds-all</artifactId>
-			<version>1.8.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jclouds.driver</groupId>
-			<artifactId>jclouds-log4j</artifactId>
-			<version>1.8.1</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -32,23 +27,28 @@
 		</dependency>  
 		<dependency>
 			<groupId>org.apache.jclouds.driver</groupId>
+			<artifactId>jclouds-log4j</artifactId>
+			<version>1.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-slf4j</artifactId>
-			<version>1.8.1</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-sshj</artifactId>
-			<version>1.8.1</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-bouncycastle</artifactId>
-			<version>1.8.1</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jclouds.driver</groupId>
 			<artifactId>jclouds-enterprise</artifactId>
-			<version>1.8.1</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
