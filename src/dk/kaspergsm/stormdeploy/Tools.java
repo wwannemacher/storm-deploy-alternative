@@ -90,7 +90,7 @@ public class Tools {
 	/**
 	 * Initialize JClouds
 	 */
-	public static ComputeServiceContext initComputeServiceContext(String provider, Configuration conf, Credential cred) {
+	public static ComputeServiceContext initComputeServiceContext(Configuration conf, Credential cred) {
 		Properties properties = new Properties();
 		
 		// Max time a script can take to execute
@@ -107,21 +107,7 @@ public class Tools {
 		
 		// inject ssh implementation
 		Iterable<Module> modules = ImmutableSet.<Module> of(new SshjSshClientModule(), new SLF4JLoggingModule(), new EnterpriseConfigurationModule());
-
-		ContextBuilder builder = null;
-		
-		// CloudStack
-		if (provider.equalsIgnoreCase("cloudstack")) {
-			properties.setProperty(Constants.PROPERTY_ENDPOINT, conf.getProviderEndpoint());
-			builder = ContextBuilder.newBuilder(provider).credentials(cred.get_cs_identity(), cred.get_cs_credential()).modules(modules).overrides(properties);
-		}
-		
-		// Amazon EC2 
-		else if (provider.equalsIgnoreCase("aws-ec2")) {
-			builder = ContextBuilder.newBuilder(provider).credentials(cred.get_ec2_identity(), cred.get_ec2_credential()).modules(modules).overrides(properties);
-		}
-		
-		return builder.buildView(ComputeServiceContext.class);
+		return ContextBuilder.newBuilder("aws-ec2").credentials(cred.get_ec2_identity(), cred.get_ec2_credential()).modules(modules).overrides(properties).buildView(ComputeServiceContext.class);
 	}
 	
 	/**

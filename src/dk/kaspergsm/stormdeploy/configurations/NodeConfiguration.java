@@ -86,8 +86,10 @@ public class NodeConfiguration {
 		/**
 		 * Start memory manager (to help share resources among Java processes)
 		 * 	requires StormDeployAlternative is installed remotely
+		 *  and user has specified he wants it running
 		 */
-		commands.addAll(StormDeployAlternative.runMemoryMonitor(config.getImageUsername()));
+		if (config.executeMemoryMonitor())
+			commands.addAll(StormDeployAlternative.runMemoryMonitor(config.getImageUsername()));
 		
 		// Return commands
 		return commands;

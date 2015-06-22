@@ -6,11 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Set;
-import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.domain.Hardware;
-import org.jclouds.compute.domain.Image;
-import org.jclouds.domain.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dk.kaspergsm.stormdeploy.Tools;
@@ -27,11 +22,11 @@ public class Configuration {
 	private ArrayList<String> _conf;
 	
 	private HashSet<String> _allConfigurationSettings = new HashSet<String>(Arrays.asList(
-			"provider",	"provider-endpoint",
 			"storm-version", 
 			"zk-version",
 			"image","image-username",
 			"region",
+			"memory-monitor",
 			"remote-exec-preconfig",
 			"remote-exec-postconfig"));
 	
@@ -53,127 +48,8 @@ public class Configuration {
 			log.error("Clustername not found in configuration.yaml");
 			return false;
 		}
-		
-		if (!getProvider().equalsIgnoreCase("cloudstack") && !getProvider().equalsIgnoreCase("aws-ec2")) {
-			log.error("Only Amazon EC2 and CloudStack are supported providers");
-			return false;
-		}
-		
-		if (getProvider().equalsIgnoreCase("cloudstack") && getProviderEndpoint() == null) {
-			log.error("When using cloudstack, a provider-endpoint must be specified. For instance: provider-endpoint \"http://ip:port/client/api\"");
-			return false;
-		}
-		
-		if (!getProvider().equalsIgnoreCase("cloudstack") && getProviderEndpoint() != null) {
-			log.error("Only specify provider endpoint, when deploying to cloudstack");
-			return false;
-		}
-		
+				
 		return true;
-	}
-	
-	/**
-	 * Method updates configuration values to ensure either name or id can be used
-	 */
-	public void updateConfiguration(ComputeService compute) {
-		
-		// Disabled for Amazon EC2. It takes too much time to fetch information.
-		if (getProvider().equalsIgnoreCase("aws-ec2")) {
-			return;
-		}
-		
-		
-		// Check if specified image is the id or name
-		Set<? extends Image> availableImages = compute.listImages();
-		String image = getRawConfigValue("image");
-		for (Image i : availableImages) {
-			if (i.getId().equalsIgnoreCase(image)) {
-				_imageID = i.getId();
-				break;
-			}
-		}
-		if (_imageID == null) {
-			for (Image i : availableImages) {
-				if (i.getName().equalsIgnoreCase(image)) {
-					_imageID = i.getId();
-				}
-			}
-		}
-		if (_imageID == null) {
-			log.error("Specified image could not be found!");
-			System.exit(0);
-		}
-		
-		// Check if specified location is the id or name
-		Set<? extends Location> availableLocations = compute.listAssignableLocations();
-		String location = getRawConfigValue("region");
-		for (Location l : availableLocations) {
-			if (l.getId().equalsIgnoreCase(location)) {
-				_locationID = l.getId();
-				break;
-			}
-		}
-		if (_locationID == null) {
-			for (Location l : availableLocations) {
-				if (l.getDescription().equalsIgnoreCase(location)) {
-					_locationID = l.getId();
-					break;
-				}
-			}
-		}
-		if (_locationID == null) {
-			log.error("Specified region/location could not be found!");
-			System.exit(0);
-		}
-		
-		// Check if specified instancetypes are id or name 
-		Set<? extends Hardware> availableHardware = compute.listHardwareProfiles();
-		HashSet<String> instanceTypesSpecified = new HashSet<String>();
-		for (int nodeId = 0; nodeId < _conf.size(); nodeId++) {
-			if (_allConfigurationSettings.contains(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "))))
-				continue;
-			instanceTypesSpecified.add(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" ")));
-		}
-				
-		// Find all specified instancetypes which are ids
-		HashMap<String, String> instanceTypeToId = new HashMap<String, String>();
-		for (Hardware h : availableHardware) {
-			for (String curInstanceType : instanceTypesSpecified) {
-				if (h.getId().equalsIgnoreCase(curInstanceType)) {
-					instanceTypeToId.put(h.getId(), h.getId());
-				}
-			}
-		}
-		
-		// Find map from instancetypes which are names to ids
-		for (Hardware h : availableHardware) {
-			for (String curInstanceType : instanceTypesSpecified) {
-				if (instanceTypeToId.containsKey(curInstanceType))
-					continue;
-				
-				if (h.getName().equalsIgnoreCase(h.getName())) {
-					instanceTypeToId.put(h.getName(), h.getId());
-				}
-			}
-		}
-		
-		// Check all ids have been found
-		if (!instanceTypesSpecified.equals(instanceTypeToId.keySet())) {
-			log.error("Not all instancetypes could be found!");
-			System.exit(0);
-		}
-		
-		// Create nodeid to instancetype
-		_nodeIdToInstanceTypeID = new HashMap<Integer, String>();
-		for (int nodeId = 0; nodeId < _conf.size(); nodeId++) {
-			if (_allConfigurationSettings.contains(_conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "))))
-				continue;
-			
-			String instance = _conf.get(nodeId).substring(0, _conf.get(nodeId).indexOf(" "));
-			_nodeIdToInstanceTypeID.put(nodeId, instanceTypeToId.get(instance));
-		}
-		
-		log.info("Updated configuration");
 	}
 	
 	/**
@@ -218,27 +94,7 @@ public class Configuration {
 		
 		return imageUsername;
 	}
-	
-	/**
-	 * Get provider endpoint
-	 */
-	public String getProviderEndpoint() {
-		return getRawConfigValue("provider-endpoint");
-	}
-	
-	/**
-	 * Get provider
-	 */
-	public String getProvider() {
-		String provider = getRawConfigValue("provider");
 		
-		// If no provider is specified, assume amazon ec2
-		if (provider == null)
-			return "aws-ec2";
-		
-		return provider;
-	}
-	
 	/**
 	 * Get region
 	 */
@@ -247,6 +103,17 @@ public class Configuration {
 			return _locationID;
 		}
 		return getRawConfigValue("region");
+	}
+	
+	/**
+	 * Get whether memory monitor should be executed or not
+	 * Default = false
+	 */
+	public boolean executeMemoryMonitor() {
+		String memoryMonitor = getRawConfigValue("memory-monitor");
+		if (memoryMonitor != null && memoryMonitor.trim().equalsIgnoreCase("true"))
+			return true;
+		return false;
 	}
 	
 	/**

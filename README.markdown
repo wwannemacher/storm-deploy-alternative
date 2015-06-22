@@ -2,9 +2,6 @@ Fast tool to deploy [Storm](https://github.com/apache/incubator-storm) on [Amazo
 
 _Please don't hesitate to contact me. Your feedback will help to further improve this tool._
 
-## Notice
-I am working on adding support for deploying on [Apache CloudStack](http://cloudstack.apache.org/). I have had to change the credential specification a bit. When updating to the newest version, please change your credential.yaml according to credential_example.yaml.
-
 ## Features
 + Runs Storm and Zookeeper daemons under supervision (automatically restarted in case of failure)
 + Only fetch and compile what is needed (can deploy on prepared images in a few minutes)
@@ -26,10 +23,10 @@ mycluster:
     - m1.medium {WORKER}
     - storm-version "0.8.2"
     - zk-version "3.3.3"
-    - image "eu-west-1/ami-480bea3f" 	#official Ubuntu 13.10 AMI
+    - image "eu-west-1/ami-97344ae0" 	#official Ubuntu 14.04 LTS AMI
     - region "eu-west-1"
-    - exec-preconfig {cd ~, echo hey > hey.txt}
-    - exec-postconfig {}
+    - remote-exec-preconfig {cd ~, echo hey > hey.txt}
+    - remote-exec-postconfig {}
 ```
 + WORKER is the Storm Supervisor daemon
 + MASTER is the Storm Nimbus daemon

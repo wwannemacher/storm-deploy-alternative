@@ -14,7 +14,6 @@ import dk.kaspergsm.stormdeploy.Tools;
  */
 public class Credential {
 	private static Logger log = LoggerFactory.getLogger(Credential.class);
-	private String _identityCloudStack = null, _credentialCloudStack = null;
 	private String _x509pkPathEC2 = null, _x509certPathEC2 = null;
 	private String _identityEC2 = null, _credentialEC2 = null;
 		
@@ -63,16 +62,6 @@ public class Credential {
 			log.error("Incomplete credentials for Amazon Web Services x509 credentials");
 			System.exit(0);
 		}
-		
-		// Parse cloudstack credentials
-		if (credentials.containsKey("cs-identity"))
-			_identityCloudStack = (String)credentials.get("cs-identity");
-		if (credentials.containsKey("cs-credential"))
-			_credentialCloudStack = (String)credentials.get("cs-credential");
-		if ((_identityCloudStack == null && _credentialCloudStack != null) || _identityCloudStack != null && _credentialCloudStack == null) {
-			log.error("Incomplete credentials for CloudStack");
-			System.exit(0);
-		}
 	}
 	
 	public String get_ec2_X509PrivateKeyPath() {
@@ -89,13 +78,5 @@ public class Credential {
 	
 	public String get_ec2_credential() {
 		return _credentialEC2;
-	}
-	
-	public String get_cs_identity() {
-		return _identityCloudStack;
-	}
-	
-	public String get_cs_credential() {
-		return _credentialCloudStack;
 	}
 }

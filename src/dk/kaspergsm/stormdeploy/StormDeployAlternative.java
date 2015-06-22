@@ -50,8 +50,8 @@ public class StormDeployAlternative {
 		/**
 		 * Check selected cloud provider is supported
 		 */
-		if (!Tools.getAllProviders().contains(config.getProvider())) {
-			log.error("provider " + config.getProvider() + " not in supported list: " + Tools.getAllProviders());
+		if (!Tools.getAllProviders().contains("aws-ec2")) {
+			log.error("aws-ec2 not in supported list: " + Tools.getAllProviders());
 			System.exit(0);
 		}
 
@@ -68,14 +68,8 @@ public class StormDeployAlternative {
 		/**
 		 * Initialize connection to cloud provider
 		 */
-		ComputeServiceContext computeContext = Tools.initComputeServiceContext(config.getProvider(), config, credentials);
+		ComputeServiceContext computeContext = Tools.initComputeServiceContext(config, credentials);
 		log.info("Initialized cloud provider service");
-
-
-		/**
-		 * Update configuration
-		 */
-		config.updateConfiguration(computeContext.getComputeService());
 
 
 		/**
