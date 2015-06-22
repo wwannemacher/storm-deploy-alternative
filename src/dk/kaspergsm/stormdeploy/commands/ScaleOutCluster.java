@@ -37,6 +37,7 @@ public class ScaleOutCluster {
 		 */
 		ArrayList<NodeMetadata> existingZookeeper = new ArrayList<NodeMetadata>();
 		ArrayList<NodeMetadata> existingWorkers = new ArrayList<NodeMetadata>();
+		ArrayList<NodeMetadata> existingDRPC = new ArrayList<NodeMetadata>();
 		NodeMetadata nimbus = null, ui = null;
 		String image = null, region = null;
 		for (NodeMetadata n : (Set<NodeMetadata>) computeContext.getComputeService().listNodes()) {			
@@ -55,6 +56,8 @@ public class ScaleOutCluster {
 						existingWorkers.add(n);
 					if (daemon.trim().toLowerCase().equals("zk"))
 						existingZookeeper.add(n);
+					if (daemon.trim().toLowerCase().equals("drpc"))
+						existingDRPC.add(n);
 				}
 				
 				if (image == null)
@@ -75,6 +78,7 @@ public class ScaleOutCluster {
 						credentials, 
 						config, 
 						getInstancesPrivateIp(existingZookeeper), 
+						getInstancesPrivateIp(existingDRPC), 
 						nimbus.getPrivateAddresses().iterator().next(), 
 						ui.getPrivateAddresses().iterator().next()), 
 					instanceType, 

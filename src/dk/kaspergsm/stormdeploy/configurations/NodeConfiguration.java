@@ -14,7 +14,7 @@ import dk.kaspergsm.stormdeploy.userprovided.Credential;
  */
 public class NodeConfiguration {
 	
-	public static List<Statement> getCommands(String clustername, Credential credentials, Configuration config, List<String> zookeeperHostnames, String nimbusHostname, String uiHostname) {
+	public static List<Statement> getCommands(String clustername, Credential credentials, Configuration config, List<String> zookeeperHostnames, List<String> drpcHostnames, String nimbusHostname, String uiHostname) {
 		List<Statement> commands = new ArrayList<Statement>();
 		
 		// Install system tools
@@ -63,7 +63,7 @@ public class NodeConfiguration {
 		commands.addAll(Zookeeper.configure(zookeeperHostnames));
 		
 		// Configure Storm (update configurationfiles)
-		commands.addAll(Storm.configure(nimbusHostname, zookeeperHostnames, config.getImageUsername()));
+		commands.addAll(Storm.configure(nimbusHostname, zookeeperHostnames, drpcHostnames, config.getImageUsername()));
 		
 		// Configure Ganglia
 		commands.addAll(Ganglia.configure(clustername, uiHostname));
@@ -80,6 +80,7 @@ public class NodeConfiguration {
 		commands.addAll(Storm.startNimbusDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Storm.startSupervisorDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Storm.startUIDaemonSupervision(config.getImageUsername()));
+		commands.addAll(Storm.startDRPCDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Storm.startLogViewerDaemonSupervision(config.getImageUsername()));
 		commands.addAll(Ganglia.start());
 		

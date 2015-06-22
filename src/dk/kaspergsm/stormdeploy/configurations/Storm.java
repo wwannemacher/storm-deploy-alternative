@@ -27,7 +27,7 @@ public class Storm {
 	/**
 	 * Write storm/conf/storm.yaml (basic settings only)
 	 */
-	public static List<Statement> configure(String hostname, List<String> zkNodesHostname, String userName) {
+	public static List<Statement> configure(String hostname, List<String> zkNodesHostname, List<String> drpcHostname, String userName) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~/storm/conf/"));
 		st.add(exec("touch storm.yaml"));
@@ -39,6 +39,13 @@ public class Storm {
 		st.add(exec("echo storm.zookeeper.servers: >> storm.yaml"));
 		for (int i = 1; i <= zkNodesHostname.size(); i++)
 			st.add(exec("echo - \"" + zkNodesHostname.get(i-1) + "\" >> storm.yaml"));
+
+		// Add drpc.servers
+                if (drpcHostname.size() > 0) {
+                    st.add(exec("echo drpc.servers: >> storm.yaml"));
+                    for (int i = 1; i <= drpcHostname.size(); i++)
+			st.add(exec("echo - \"" + drpcHostname.get(i-1) + "\" >> storm.yaml"));
+                }
 		
 		// Add supervisor metadata
 		st.add(exec("echo supervisor.scheduler.meta: >> storm.yaml"));
@@ -81,6 +88,16 @@ public class Storm {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("cd ~"));
 		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *UI*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.ui.core storm/bin/storm ui ;; esac &' - " + username));
+		return st;
+	}
+	
+	/**
+	 * Uses Monitor to restart daemon, if it stops
+	 */
+	public static List<Statement> startDRPCDaemonSupervision(String username) {
+		ArrayList<Statement> st = new ArrayList<Statement>();
+		st.add(exec("cd ~"));
+		st.add(exec("su -c 'case $(head -n 1 ~/daemons) in *DRPC*) java -cp \"sda/storm-deploy-alternative.jar\" dk.kaspergsm.stormdeploy.image.ProcessMonitor backtype.storm.daemon.drpc storm/bin/storm drpc ;; esac &' - " + username));
 		return st;
 	}
 	
