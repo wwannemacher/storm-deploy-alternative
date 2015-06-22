@@ -91,6 +91,7 @@ public class Deploy {
 							credentials,
 							config, 
 							getNewInstancesPrivateIp(config, "ZK", newNodes), 
+							getNewInstancesPrivateIp(config, "DRPC", newNodes), 
 							getNimbusNode(config, newNodes).getPrivateAddresses().iterator().next(), 
 							getUINode(config, newNodes).getPrivateAddresses().iterator().next()),
 					true,
