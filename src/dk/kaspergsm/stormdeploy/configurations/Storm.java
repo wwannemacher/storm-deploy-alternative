@@ -41,12 +41,12 @@ public class Storm {
 			st.add(exec("echo - \"" + zkNodesHostname.get(i-1) + "\" >> storm.yaml"));
 
 		// Add drpc.servers
-                if (drpcHostname.size() > 0) {
-                    st.add(exec("echo drpc.servers: >> storm.yaml"));
-                    for (int i = 1; i <= drpcHostname.size(); i++)
-			st.add(exec("echo - \"" + drpcHostname.get(i-1) + "\" >> storm.yaml"));
-                }
-		
+		if (drpcHostname.size() > 0) {
+			st.add(exec("echo drpc.servers: >> storm.yaml"));
+			for (int i = 1; i <= drpcHostname.size(); i++)
+				st.add(exec("echo - \"" + drpcHostname.get(i-1) + "\" >> storm.yaml"));
+		}
+
 		// Add supervisor metadata
 		st.add(exec("echo supervisor.scheduler.meta: >> storm.yaml"));
 		st.add(exec("instancetype=$(cat ~/.instance-type)"));

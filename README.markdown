@@ -10,7 +10,7 @@ _Please don't hesitate to contact me. Your feedback will help to further improve
 + Automatically sets up [Ganglia](http://ganglia.sourceforge.net/), making it easy to monitor performance
 + Automatically sets up [Amazon EC2 AMI Tools](http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ami-tools.html) on new nodes
 + Supports Zookeeper versions: _3.3.3_ & _3.4.5_ & _3.4.6_
-+ Supports Storm versions: _0.8.2_ & _0.9.0.1_ & _0.9.2_ & _0.9.3_
++ Supports Storm versions: _0.8.2_ & _0.9.0.1_ & _0.9.2_ & _0.9.3_ & _0.9.4_ & _0.9.5_
 
 ## Configuration
 This tool, requires two configurationfiles: `conf/credential.yaml` and `conf/configuration.yaml`. Put your credentials into the file `conf/credential.yaml`. 
@@ -21,17 +21,18 @@ Below is an example of a single cluster configuration, for `conf/configuration.y
 mycluster:
     - m1.medium {ZK, WORKER, MASTER, UI}
     - m1.medium {WORKER}
-    - storm-version "0.8.2"
-    - zk-version "3.3.3"
+    - storm-version "0.9.5"
+    - zk-version "3.4.6"
     - image "eu-west-1/ami-97344ae0" 	#official Ubuntu 14.04 LTS AMI
     - region "eu-west-1"
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
 ```
-+ WORKER is the Storm Supervisor daemon
 + MASTER is the Storm Nimbus daemon
-+ LOGVIEWER is the Storm Logviewer daemon
++ WORKER is the Storm Supervisor daemon
 + UI is the Storm and Ganglia User-Interface
++ LOGVIEWER is the Storm Logviewer daemon
++ DRPC is the Storm DRPC daemon
 + ZK is the [Zookeeper](http://zookeeper.apache.org) daemon
 
 _Please ensure the image resides in the same region as specified._
