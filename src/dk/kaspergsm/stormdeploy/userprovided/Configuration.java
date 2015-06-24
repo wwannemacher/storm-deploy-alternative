@@ -131,9 +131,7 @@ public class Configuration {
 	 */
 	public String getZKLocation() {
 		String version = getRawConfigValue("zk-version");
-		if (version.equals("3.3.3")) {
-			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.3.3.tar.gz"; 
-		} else if (version.equals("3.4.5")) {
+		if (version.equals("3.4.5")) {
 			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.4.5.tar.gz";
 		} else if (version.equals("3.4.6")) {
 			return "https://s3-eu-west-1.amazonaws.com/zk-releases/zookeeper-3.4.6.tar.gz";
