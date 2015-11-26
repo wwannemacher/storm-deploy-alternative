@@ -62,6 +62,7 @@ Adds new worker instances to an already running cluster. For example, you could 
 ## FAQ
 + I am seeing the error: `net.schmizz.sshj.userauth.UserAuthException: publickey auth failed`. This error means the software could not connect to the newly launched instances using SSH (for configuring them). There can be multiple reasons why this error happens. Please ensure you have ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub and that both files are _valid_. Furthermore, please go to AWS EC2 interface -> Key Pairs, and delete the jclouds#CLUSTER_NAME keypair. If deploying the same cluster, using multiple machines, please ensure the same keypair exists on all machines. In case problems persist, please try generating a new keypair by executing `ssh-keygen -t rsa`, then delete old keypair from AWS EC2 interface and retry deployment.
 + I am seeing the warning: `cipher strengths apparently limited by JCE policy`. You can improve your security by installing [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
++ I am seeing the error: `the trustAnchors parameter must be non-empty`. This error usually means the Java CA certificates are broken. To fix first execute `sudo dpkg --purge --force-depends ca-certificates-java` then `sudo apt-get install ca-certificates-java`.
 
 ## Limitations
 Currently, only deploying to Ubuntu AMIs on Amazon EC2 is supported.
