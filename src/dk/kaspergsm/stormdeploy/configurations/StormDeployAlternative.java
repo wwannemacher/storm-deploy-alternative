@@ -37,11 +37,11 @@ public class StormDeployAlternative {
 		return st;
 	}
 	
-	public static List<Statement> writeLocalSSHKeys() {
+	public static List<Statement> writeLocalSSHKeys(String sshKeyName) {
 		ArrayList<Statement> st = new ArrayList<Statement>();
 		st.add(exec("mkdir ~/.ssh/"));
-		st.addAll(Tools.echoFile(Tools.getHomeDir() + ".ssh" + File.separator + "id_rsa", "~/.ssh/id_rsa"));
-		st.addAll(Tools.echoFile(Tools.getHomeDir() + ".ssh" + File.separator + "id_rsa.pub", "~/.ssh/id_rsa.pub"));
+		st.addAll(Tools.echoFile(Tools.getHomeDir() + ".ssh" + File.separator + sshKeyName, "~/.ssh/id_rsa"));
+		st.addAll(Tools.echoFile(Tools.getHomeDir() + ".ssh" + File.separator + sshKeyName + ".pub", "~/.ssh/id_rsa.pub"));
 		return st;
 	}
 }

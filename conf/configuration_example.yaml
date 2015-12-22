@@ -4,11 +4,12 @@
 ectwo:
     - storm-version "0.8.2"					# Version of Storm
     - zk-version "3.3.3"					# Version of Zookeeper
-    - image "eu-west-1/ami-97344ae0"				# Ubuntu 14.04 LTS AMI
+    - image "eu-west-1/ami-97344ae0"		# Ubuntu 14.04 LTS AMI
     - region "eu-west-1"					# Region
-    - m1.medium {ZK, WORKER, MASTER, UI}			# Request service
-    - m1.medium {ZK, WORKER}					# Request service
-    - m1.medium {ZK, WORKER}					# Request service
+    - m1.medium {ZK, WORKER, MASTER, UI}	# Request service
+    - m1.medium {ZK, WORKER}				# Request service
+    - m1.medium {ZK, WORKER}				# Request service
     - m1.medium {WORKER}					# Request service
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
+    - ssh-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"

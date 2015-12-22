@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import org.jclouds.compute.ComputeService;
@@ -97,7 +97,8 @@ public class Deploy {
 					true,
 					clustername, 
 					computeContext.getComputeService(),
-					config.getImageUsername());
+					config.getImageUsername(),
+					config.getSSHKeyName());
 		} catch (RunScriptOnNodesException ex) {
 			log.error("Problem configuring instance(s)", ex);
 		} catch (InterruptedException ex) {

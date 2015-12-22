@@ -28,7 +28,8 @@ public class Configuration {
 			"region",
 			"memory-monitor",
 			"remote-exec-preconfig",
-			"remote-exec-postconfig"));
+			"remote-exec-postconfig",
+			"ssh-key-name"));
 	
 	public static Configuration fromYamlFile(File f, String clustername) {
 		return new Configuration(Tools.readYamlConf(f), clustername);
@@ -162,6 +163,19 @@ public class Configuration {
 			log.info("Storm version " + version + " not currently supported!");
 		}
 		return null;
+	}
+	
+	/**
+	 * Get the ssh key pair name
+	 */
+	public String getSSHKeyName() {
+		String sshKeyName = getRawConfigValue("ssh-key-name");
+		
+		// If no sshKeyName is specifed, assume "id_rsa"
+		if (sshKeyName == null)
+			return "id_rsa";
+		
+		return sshKeyName;
 	}
 	
 	private String getRawConfigValue(String k) {

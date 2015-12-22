@@ -60,12 +60,12 @@ public class Tools {
 	/**
 	 * Get login credentials (contains private ssh key)
 	 */
-	public static LoginCredentials getPrivateKeyCredentials(String username) {
+	public static LoginCredentials getPrivateKeyCredentials(String username, String sshKeyName) {
 		try {			
 			return LoginCredentials.builder()
 					.user(username)
 					.authenticateSudo(false)
-					.privateKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa"), UTF_8).trim())
+					.privateKey(Files.toString(new File(System.getProperty("user.home")  + File.separator + ".ssh"  + File.separator + sshKeyName), UTF_8).trim())
 					.build();
 		} catch (Exception ex) {
 			log.error("Error reading ssh keys", ex);
@@ -76,10 +76,11 @@ public class Tools {
 	
 	/**
 	 * Get public key (raw)
+	 * @param sshKeyName 
 	 */
-	public static String getPublicKey() {
+	public static String getPublicKey(String sshKeyName) {
 		try {
-			return Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"), UTF_8).trim();
+			return Files.toString(new File(System.getProperty("user.home")  + File.separator + ".ssh" + File.separator + sshKeyName + ".pub"), UTF_8).trim();
 		} catch (IOException ex) {
 			log.error("Error reading ssh keys", ex);
 			System.exit(0);
@@ -113,13 +114,13 @@ public class Tools {
 	/**
 	 * Run set of queued commands now
 	 */
-	public static void executeOnNodes(List<Statement> commands, boolean runAsRoot, String clustername, ComputeService compute, String username) throws RunScriptOnNodesException, InterruptedException, ExecutionException, TimeoutException {
+	public static void executeOnNodes(List<Statement> commands, boolean runAsRoot, String clustername, ComputeService compute, String username, String sshKeyName) throws RunScriptOnNodesException, InterruptedException, ExecutionException, TimeoutException {
 		compute.runScriptOnNodesMatching(
 				NodePredicates.runningInGroup(clustername),
 				new StatementList(commands),
 				new RunScriptOptions()
 					.nameTask("Setup")
-				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username))
+				 	.overrideLoginCredentials(Tools.getPrivateKeyCredentials(username, sshKeyName))
 				 	.wrapInInitScript(true)
 				 	.overrideLoginUser(username)
 				 	.blockOnComplete(true)

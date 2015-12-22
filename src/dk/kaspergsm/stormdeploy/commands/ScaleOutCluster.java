@@ -140,8 +140,8 @@ public class ScaleOutCluster {
 						.overrideLoginUser(config.getImageUsername())
 						.userMetadata("daemons", "[WORKER]")
 						.runScript(new StatementList(initScript))
-						.overrideLoginCredentials(Tools.getPrivateKeyCredentials(config.getImageUsername()))
-						.authorizePublicKey(Files.toString(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"), Charsets.UTF_8)));
+						.overrideLoginCredentials(Tools.getPrivateKeyCredentials(config.getImageUsername(), config.getSSHKeyName()))
+						.authorizePublicKey(Files.toString(new File(System.getProperty("user.home")  + File.separator + ".ssh" + File.separator  + config.getSSHKeyName() + ".pub"), Charsets.UTF_8)));
 			return (Set<NodeMetadata>) computeContext.getComputeService().createNodesInGroup(clustername, numInstances, templateBuilder.build());
 		} catch (IllegalArgumentException ex) {
 			log.error("Error when starting instance(s)", ex);

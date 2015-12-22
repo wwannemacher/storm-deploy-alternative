@@ -13,7 +13,7 @@ _Please don't hesitate to contact me. Your feedback will help to further improve
 + Supports Storm versions: _0.8.2_ & _0.9.0.1_ & _0.9.2_ & _0.9.3_ & _0.9.4_ & _0.9.5_
 
 ## Configuration
-This tool, requires two configurationfiles: `conf/credential.yaml` and `conf/configuration.yaml`. Put your credentials into the file `conf/credential.yaml`. 
+This tool, requires two configurationfiles: `conf/credential.yaml` and `conf/configuration.yaml`. Put your credentials into the file `conf/credential.yaml`. It's required that you have generated an SSH key-pair in `~/.ssh` with an empty pass phrase.
 
 Below is an example of a single cluster configuration, for `conf/configuration.yaml`
 
@@ -27,6 +27,7 @@ mycluster:
     - region "eu-west-1"
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
+    - ssh-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"
 ```
 + MASTER is the Storm Nimbus daemon
 + WORKER is the Storm Supervisor daemon
