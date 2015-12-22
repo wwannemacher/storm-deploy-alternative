@@ -12,4 +12,4 @@ ectwo:
     - m1.medium {WORKER}					# Request service
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
-    - ssk-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"
+    - ssh-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"

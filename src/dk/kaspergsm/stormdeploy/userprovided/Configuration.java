@@ -29,7 +29,7 @@ public class Configuration {
 			"memory-monitor",
 			"remote-exec-preconfig",
 			"remote-exec-postconfig",
-			"ssk-key-name"));
+			"ssh-key-name"));
 	
 	public static Configuration fromYamlFile(File f, String clustername) {
 		return new Configuration(Tools.readYamlConf(f), clustername);
@@ -169,7 +169,7 @@ public class Configuration {
 	 * Get the ssh key pair name
 	 */
 	public String getSSHKeyName() {
-		String sshKeyName = getRawConfigValue("ssk-key-name");
+		String sshKeyName = getRawConfigValue("ssh-key-name");
 		
 		// If no sshKeyName is specifed, assume "id_rsa"
 		if (sshKeyName == null)

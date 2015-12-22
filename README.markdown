@@ -27,7 +27,7 @@ mycluster:
     - region "eu-west-1"
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
-    - ssk-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"
+    - ssh-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"
 ```
 + MASTER is the Storm Nimbus daemon
 + WORKER is the Storm Supervisor daemon
