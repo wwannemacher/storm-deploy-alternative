@@ -57,10 +57,11 @@ public class StormDeployAlternative {
 
 
 		/**
-		 * Check if file id_rsa and id_rsa.pub exists
+		 * Check if file ssh key pair private and public exist
 		 */
-		if (!new File(System.getProperty("user.home") + "/.ssh/id_rsa").exists() || !new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub").exists()) {
-			log.error("Missing rsa ssh keypair. Please generate keypair, without password, by issuing: ssh-keygen -t rsa");
+		String sshKeyPath = System.getProperty("user.home") + File.separator + ".ssh" + File.separator;
+		if (!new File(sshKeyPath + config.getSSHKeyName()).exists() || !new File(sshKeyPath + config.getSSHKeyName() + ".pub").exists()) {
+			log.error("Missing rsa ssh keypair with name: " + config.getSSHKeyName() + ". Please generate keypair, without passphrase, by issuing: ssh-keygen -t rsa");
 			System.exit(0);
 		}
 
