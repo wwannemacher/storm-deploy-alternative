@@ -26,6 +26,8 @@ public class Configuration {
 			"zk-version",
 			"image","image-username",
 			"region",
+			"subnet",
+			"security-group",
 			"memory-monitor",
 			"remote-exec-preconfig",
 			"remote-exec-postconfig",
@@ -95,7 +97,21 @@ public class Configuration {
 		
 		return imageUsername;
 	}
-		
+
+	/**
+	 * Get Subnet if specified
+	 */
+	public String getSubnet() {
+		return getRawConfigValue("subnet");
+	}
+
+	/**
+	 * Get Security Group if specified
+	 */
+	public String getSecurityGroup() {
+		return getRawConfigValue("security-group");
+	}
+
 	/**
 	 * Get region
 	 */
@@ -170,14 +186,14 @@ public class Configuration {
 	 */
 	public String getSSHKeyName() {
 		String sshKeyName = getRawConfigValue("ssh-key-name");
-		
+
 		// If no sshKeyName is specifed, assume "id_rsa"
 		if (sshKeyName == null)
 			return "id_rsa";
-		
+
 		return sshKeyName;
 	}
-	
+
 	private String getRawConfigValue(String k) {
 		for (int i = 0; i < _conf.size(); i++) {
 			String key = _conf.get(i).substring(0, _conf.get(i).indexOf(" "));

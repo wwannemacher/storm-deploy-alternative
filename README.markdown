@@ -25,6 +25,8 @@ mycluster:
     - zk-version "3.4.6"
     - image "eu-west-1/ami-97344ae0" 	#official Ubuntu 14.04 LTS AMI
     - region "eu-west-1"
+    - subnet "subnet-b612cdd3"          # Optional.
+    - security-group "sg-152e1370"      # Optional.
     - remote-exec-preconfig {cd ~, echo hey > hey.txt}
     - remote-exec-postconfig {}
     - ssh-key-name "mySSHKeyName"           # Optional. defaults to "id_rsa"
