@@ -1,10 +1,8 @@
 package dk.kaspergsm.stormdeploy;
 
-import static org.jclouds.scriptbuilder.domain.Statements.exec;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import dk.kaspergsm.stormdeploy.configurations.Zookeeper;
+import dk.kaspergsm.stormdeploy.userprovided.Configuration;
+import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -13,23 +11,28 @@ import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.scriptbuilder.domain.StatementList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import dk.kaspergsm.stormdeploy.configurations.Zookeeper;
-import dk.kaspergsm.stormdeploy.userprovided.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 /**
  * Used to launch a new nodes
- * 
+ *
  * @author Kasper Grud Skat Madsen
  */
 public class LaunchNodeThread extends Thread {
 	private static Logger log = LoggerFactory.getLogger(LaunchNodeThread.class);
-	private String _instanceType, _clustername, _region, _image, _username, _sshkeyname;
+	private String _instanceType, _clustername, _region, _image, _username, _sshkeyname, _subnetId, _securityGroupId;;
 	private Set<NodeMetadata> _newNodes = null;
 	private List<Statement> _initScript;
 	private ComputeService _compute;
 	private List<Integer> _nodeids;
 	private List<String> _daemons;
-	
+
 	/**
 	 * @param compute
 	 *            ComputeService from JClouds
@@ -52,13 +55,15 @@ public class LaunchNodeThread extends Thread {
 		_region = config.getDeploymentLocation();
 		_username = config.getImageUsername();
 		_image = config.getDeploymentImage();
+		_subnetId = config.getSubnet();
+		_securityGroupId = config.getSecurityGroup();
 		_instanceType = instanceType;
 		_clustername = clustername;
 		_daemons = daemons;
 		_compute = compute;
 		_nodeids = nodeids;
 		_sshkeyname = config.getSSHKeyName();
-		
+
 		// Create initScript
 		_initScript = new ArrayList<Statement>();
 		_initScript.add(exec("echo \"" + daemons.toString() + "\" > ~/daemons"));
@@ -74,6 +79,25 @@ public class LaunchNodeThread extends Thread {
 	@Override
 	public void run() {
 		try {
+			TemplateOptions options = _compute.templateOptions();
+					options.runAsRoot(false)
+					.wrapInInitScript(true)
+					.overrideLoginUser(_username)
+					.inboundPorts(Tools.getPortsToOpen())
+					.userMetadata("daemons", _daemons.toString())
+					.runScript(new StatementList(_initScript))
+					.overrideLoginCredentials(Tools.getPrivateKeyCredentials(_username, _sshkeyname))
+					.authorizePublicKey(Tools.getPublicKey(_sshkeyname));
+			if(_subnetId != null){
+				if(_securityGroupId != null){
+					options.as(AWSEC2TemplateOptions.class).subnetId(_subnetId).securityGroupIds(_securityGroupId);
+				}
+				else{
+					options.as(AWSEC2TemplateOptions.class).subnetId(_subnetId);
+				}
+
+			}
+
 			_newNodes = (Set<NodeMetadata>) _compute.createNodesInGroup(
 					_clustername,
 					_nodeids.size(),
@@ -81,16 +105,7 @@ public class LaunchNodeThread extends Thread {
 							.hardwareId(_instanceType)
 							.locationId(_region)
 							.imageId(_image)
-							.options(
-									new TemplateOptions()
-											.runAsRoot(false)
-											.wrapInInitScript(true)
-											.overrideLoginUser(_username)
-											.inboundPorts(Tools.getPortsToOpen())
-											.userMetadata("daemons", _daemons.toString())
-											.runScript(new StatementList(_initScript))
-											.overrideLoginCredentials(Tools.getPrivateKeyCredentials(_username, _sshkeyname))
-											.authorizePublicKey(Tools.getPublicKey(_sshkeyname))).build());
+							.options(options).build());
 		} catch (NoSuchElementException ex) {
 			// happens often when hardwareId is not found. List all possible hardware types
 			if (ex.getMessage().toLowerCase().contains("hardwareid") && ex.getMessage().toLowerCase().contains("not found")) {
@@ -100,7 +115,7 @@ public class LaunchNodeThread extends Thread {
 					log.info(h.toString());
 				}
 			} else {
-				log.error("Problem: ", ex);	
+				log.error("Problem: ", ex);
 			}
 		} catch (Exception ex) {
 			log.error("Problem launching instance", ex);
